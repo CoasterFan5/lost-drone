@@ -1,11 +1,19 @@
 import { Conveyer } from './conveyer';
 import { Crafter } from './crafter/crafter';
 import { Furnace } from './furnace';
+import { MappingRelay } from './mappingRelay';
 import { Miner } from './miner';
 import { Splitter } from './splitter';
 import type { GameBuilding } from './utils/BehaviorBase';
 
-export const gameBuildings = ['Conveyer', 'Miner', 'Furnace', 'Splitter', 'Crafter'] as const;
+export const gameBuildings = [
+	'Conveyer',
+	'Miner',
+	'Furnace',
+	'Splitter',
+	'Crafter',
+	'MappingRelay'
+] as const;
 
 export type GameBuildingName = (typeof gameBuildings)[number];
 
@@ -14,5 +22,6 @@ export const gameBuildingBehavior: Record<GameBuildingName, new () => GameBuildi
 	Furnace: Furnace,
 	Miner: Miner,
 	Splitter: Splitter,
-	Crafter: Crafter
+	Crafter: Crafter,
+	MappingRelay: MappingRelay
 };

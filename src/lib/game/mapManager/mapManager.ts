@@ -5,7 +5,17 @@ import { UiManager } from '../uiManager/uiManager';
 import { TileManager, type FacingDirection, type TerrainType } from './tileManager';
 import { tileSize } from './tileSize';
 
-export const itemList = ['ironOre', 'ironPlate', 'ironGear', 'ironRod', 'copperOre'] as const;
+export const itemList = [
+	'ironOre',
+	'ironPlate',
+	'ironGear',
+	'ironRod',
+	'copperOre',
+	'copperPlate',
+	'circuitBoard',
+	'dataDrive',
+	'mappingData'
+] as const;
 export type GameItem = (typeof itemList)[number];
 
 export type Tile = {

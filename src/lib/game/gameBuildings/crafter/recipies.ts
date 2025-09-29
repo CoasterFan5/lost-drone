@@ -1,6 +1,6 @@
 import type { GameItem } from '$lib/game/mapManager/mapManager';
 
-export const craftingRecipieNames = ['ironGear', 'ironRod'] as const;
+export const craftingRecipieNames = ['ironGear', 'ironRod', 'circuitBoard', 'dataDrive'] as const;
 export type RecipieName = (typeof craftingRecipieNames)[number];
 
 export const craftingRecipies: Record<
@@ -17,5 +17,13 @@ export const craftingRecipies: Record<
 	ironRod: {
 		requirements: ['ironPlate'],
 		product: 'ironRod'
+	},
+	circuitBoard: {
+		requirements: ['ironPlate', 'copperPlate'],
+		product: 'circuitBoard'
+	},
+	dataDrive: {
+		requirements: ['circuitBoard', 'ironPlate'],
+		product: 'dataDrive'
 	}
 } as const;

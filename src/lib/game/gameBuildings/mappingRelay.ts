@@ -1,29 +1,23 @@
 import { getNextTile } from './utils/getDirectionTile';
-import imageData from '$lib/assets/Smelter.png';
-import type { GameItem } from '../mapManager/mapManager';
+import imageData from '$lib/assets/Mapping Relay.png';
 import {
 	GameBuilding,
 	type CanAcceptItemParams,
 	type TickMethodParams
 } from './utils/BehaviorBase';
 
-const productMap: Partial<Record<GameItem, GameItem>> = {
-	ironOre: 'ironPlate',
-	copperOre: 'copperPlate'
-} as const;
-
-export class Furnace extends GameBuilding {
+export class MappingRelay extends GameBuilding {
 	private htmlImage: HTMLImageElement | undefined = undefined;
 	private cooldown = 0;
-	private DEFAULT_COOLDOWN = 2_000;
+	private DEFAULT_COOLDOWN = 5_000;
 
 	constructor() {
 		super();
+		this.cooldown = this.DEFAULT_COOLDOWN;
 	}
 
 	new() {
-		return new Furnace();
-		this.cooldown = this.DEFAULT_COOLDOWN;
+		return new MappingRelay();
 	}
 
 	tick({ thisTile, mapManager, x, y, delta }: TickMethodParams) {
@@ -33,14 +27,11 @@ export class Furnace extends GameBuilding {
 			if (
 				nextTile &&
 				thisTile.data.holding &&
-				productMap[thisTile.data.holding] &&
-				nextTile.canHoldItem(productMap[thisTile.data.holding]!)
+				thisTile.data.holding == 'dataDrive' &&
+				nextTile.canHoldItem('mappingData')
 			) {
-				const product = productMap[thisTile.data.holding];
-				if (product) {
-					nextTile.setHolding(product);
-					thisTile.clearHolding();
-				}
+				nextTile.setHolding('mappingData');
+				thisTile.clearHolding();
 			}
 		}
 	}
@@ -58,6 +49,6 @@ export class Furnace extends GameBuilding {
 	}
 
 	canAcceptItem({ tile, itemName }: CanAcceptItemParams) {
-		return !tile.data.holding && productMap[itemName] != undefined;
+		return !tile.data.holding && itemName == 'dataDrive';
 	}
 }

@@ -35,6 +35,22 @@ export class Crafter extends GameBuilding {
 		copperOre: {
 			count: 0,
 			max: 10
+		},
+		copperPlate: {
+			count: 0,
+			max: 10
+		},
+		circuitBoard: {
+			count: 0,
+			max: 3
+		},
+		dataDrive: {
+			count: 0,
+			max: 3
+		},
+		mappingData: {
+			count: 0,
+			max: 3
 		}
 	};
 
