@@ -7,6 +7,7 @@ import {
 } from './utils/BehaviorBase';
 
 export class MappingRelay extends GameBuilding {
+	name = 'Mapping Relay';
 	private htmlImage: HTMLImageElement | undefined = undefined;
 	private cooldown = 0;
 	private DEFAULT_COOLDOWN = 5_000;

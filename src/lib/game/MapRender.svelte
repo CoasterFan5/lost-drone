@@ -11,8 +11,11 @@
 	import { tileSize } from './mapManager/tileSize';
 	import { renderTiles } from './renderHelpers/renderTiles';
 	import { imageManipulationValues } from './renderHelpers/imageManipulationValues';
+	import type { TileManager } from './mapManager/tileManager';
+	import { itemImageMap } from './colorMaps';
 
 	let uiKey = $state(0);
+	let hoveringTile: TileManager | undefined = $state(undefined);
 
 	const {
 		mapManager,
@@ -72,6 +75,7 @@
 				//render cursor
 
 				const selectedTile = mapManager.getSelectedTile();
+				hoveringTile = selectedTile;
 				const cursorHtmlImage = new Image();
 				if (mapManager.getSelectedBuilding() && selectedTile) {
 					if (
@@ -87,6 +91,7 @@
 					}
 				} else {
 					if (selectedTile && selectedTile.data.building?.getUi) {
+						hoveringTile = selectedTile;
 						cursorHtmlImage.src = cursorInteractImageData;
 					} else {
 						cursorHtmlImage.src = cursorImage;
@@ -146,11 +151,91 @@
 		<CustomComp {...details.props} />
 	{/if}
 {/key}
+<div class="hoverManager">
+	<div class="section">
+		<p>Objective: <span class="objective">Map Planet</span></p>
+		<div class="progress"></div>
+	</div>
+	{#if hoveringTile?.data.terrain != undefined}
+		<div class="section">
+			<p>Terrain: {hoveringTile?.data.terrain}</p>
+		</div>
+	{/if}
+	{#if hoveringTile?.data.building}
+		{@const inv = hoveringTile.data.building.getInventory(hoveringTile)}
+		<div class="section">
+			<p>Hovering: <span class="objective">{hoveringTile.data.building.name}</span></p>
+			{#if inv && inv.length > 0}
+				<p>Holding:</p>
+				{#each inv as i, index (index)}
+					<div class="inventoryItem">
+						<img src={itemImageMap[i[0]].src} alt={i[0]} />
+						<span class="label">{i[1]}</span>
+					</div>
+				{/each}
+			{/if}
+		</div>
+	{/if}
+</div>
 <canvas bind:this={canvas}> </canvas>
 
 <style lang="scss">
 	canvas {
 		width: 100%;
 		height: 100vh;
+	}
+
+	.hoverManager {
+		position: fixed;
+		display: flex;
+		flex-direction: column;
+		right: 0px;
+		top: 0px;
+		padding: 0.5rem;
+		width: 20rem;
+		background: var(--gray);
+		color: var(--white);
+		gap: 0.25rem;
+
+		p {
+			margin: 0;
+			text-align: left;
+		}
+
+		.progress {
+			width: 100%;
+			background: #002400;
+			height: 0.5rem;
+			position: relative;
+			border-radius: 0.1rem;
+
+			&::after {
+				content: '';
+				position: absolute;
+				left: 0px;
+				top: 0px;
+				width: 1%;
+				height: 100%;
+				background: #008000;
+				border-radius: 0.1rem;
+			}
+		}
+
+		.inventoryItem {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			position: relative;
+			aspect-ratio: 1/1;
+			height: 2rem;
+			width: 2rem;
+
+			.label {
+				position: absolute;
+				right: 0px;
+				bottom: 0px;
+				background: rgba(0, 0, 0, 0.25);
+			}
+		}
 	}
 </style>

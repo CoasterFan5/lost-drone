@@ -35,6 +35,7 @@ export type GetUiParams = {
 
 export abstract class GameBuilding {
 	private COOLDOWN_TIME = 5_000;
+	abstract name: string;
 
 	constructor() {}
 
@@ -64,5 +65,13 @@ export abstract class GameBuilding {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	onClick(params: OnClickParams): void {
 		return;
+	}
+
+	getInventory(params: TileManager): [GameItem, number][] {
+		if (params.data.holding) {
+			return [[params.data.holding, 1]];
+		} else {
+			return [];
+		}
 	}
 }

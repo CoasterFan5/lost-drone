@@ -3,6 +3,7 @@ import imageData from '$lib/assets/Splitter.png';
 import { getNextTile, getRightTIle } from './utils/getDirectionTile';
 
 export class Splitter extends GameBuilding {
+	name = 'Splitter';
 	private DEFAULT_COOLDOWN = 1_000;
 	private cooldown = 0;
 	private htmlImage: HTMLImageElement | undefined = undefined;

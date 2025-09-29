@@ -11,10 +11,12 @@ import {
 import { getNextTile } from '../utils/getDirectionTile';
 import CrafterUi from './CrafterUi.svelte';
 import { craftingRecipies, type RecipieName } from './recipies';
+import type { TileManager } from '$lib/game/mapManager/tileManager';
 
 let image: HTMLImageElement | undefined = undefined;
 
 export class Crafter extends GameBuilding {
+	name = 'Crafter';
 	private storage: Record<GameItem, { count: number; max: number }> = {
 		ironOre: {
 			count: 0,
@@ -147,5 +149,16 @@ export class Crafter extends GameBuilding {
 
 	setRecipie(name: RecipieName) {
 		this.selectedRecipie = name;
+	}
+
+	getInventory(): [GameItem, number][] {
+		const i: [GameItem, number][] = [];
+		for (const invItem in this.storage) {
+			const record = this.storage[invItem as GameItem];
+			if (record.count > 0) {
+				i.push([invItem as GameItem, record.count]);
+			}
+		}
+		return i;
 	}
 }

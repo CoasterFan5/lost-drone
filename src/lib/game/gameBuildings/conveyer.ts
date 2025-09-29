@@ -5,6 +5,7 @@ import { GameBuilding, type TickMethodParams } from './utils/BehaviorBase';
 export class Conveyer extends GameBuilding {
 	private DEFAULT_COOLDOWN = 1_000;
 	private cooldown = 0;
+	name = 'Conveyer';
 	private htmlImage: HTMLImageElement | undefined = undefined;
 
 	constructor() {
