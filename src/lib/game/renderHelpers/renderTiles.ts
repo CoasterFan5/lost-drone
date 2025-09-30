@@ -1,6 +1,6 @@
 import { itemImageMap } from '../colorMaps';
 import type { GameMapManager } from '../mapManager/mapManager';
-import { tileSize } from '../mapManager/tileSize';
+import { getTileSize } from '../mapManager/tileSize';
 import { imageManipulationValues } from './imageManipulationValues';
 import ironOreImageData from '$lib/assets/tiles/iron_ore.png';
 import copperOreImageData from '$lib/assets/tiles/Copper Ore.png';
@@ -41,21 +41,33 @@ export const renderTiles = ({
 		for (let y = -1; y < yTiles + 1; y++) {
 			const t = mapManager.getTile(x + xOffsetTiles - xTilesHalf, y + yOffsetTiles - yTilesHalf);
 
-			const trueRenderX = Math.round(x * tileSize - xOffsetPx);
-			const trueRenderY = Math.round(y * tileSize - yOffsetPx);
+			const trueRenderX = Math.round(x * getTileSize() - xOffsetPx);
+			const trueRenderY = Math.round(y * getTileSize() - yOffsetPx);
 
 			if (t) {
 				ctx.fillStyle = '#43264C';
-				ctx.fillRect(trueRenderX, trueRenderY, tileSize, tileSize);
+				ctx.fillRect(trueRenderX, trueRenderY, getTileSize(), getTileSize());
 
 				if (t.data.terrain) {
 					switch (t.data.terrain) {
 						case 'iron_ore': {
-							ctx.drawImage(ironOreTileImage, trueRenderX, trueRenderY, tileSize, tileSize);
+							ctx.drawImage(
+								ironOreTileImage,
+								trueRenderX,
+								trueRenderY,
+								getTileSize(),
+								getTileSize()
+							);
 							break;
 						}
 						case 'copper_ore': {
-							ctx.drawImage(copperOreTileImage, trueRenderX, trueRenderY, tileSize, tileSize);
+							ctx.drawImage(
+								copperOreTileImage,
+								trueRenderX,
+								trueRenderY,
+								getTileSize(),
+								getTileSize()
+							);
 							break;
 						}
 					}
@@ -68,13 +80,13 @@ export const renderTiles = ({
 					ctx.translate(trueRenderX, trueRenderY);
 					ctx.rotate(manipulationValues.r);
 					ctx.translate(manipulationValues.xOffset, manipulationValues.yOffset);
-					ctx.drawImage(renderer, 0, 0, tileSize, tileSize);
+					ctx.drawImage(renderer, 0, 0, getTileSize(), getTileSize());
 					ctx.restore();
 				}
 
 				if (t.data.holding) {
 					const img = itemImageMap[t.data.holding];
-					ctx.drawImage(img, trueRenderX, trueRenderY, tileSize, tileSize);
+					ctx.drawImage(img, trueRenderX, trueRenderY, getTileSize(), getTileSize());
 				}
 			}
 		}

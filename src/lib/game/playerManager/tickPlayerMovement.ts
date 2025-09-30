@@ -1,9 +1,7 @@
 import type { KeyboardManager } from '../keyboardManager';
 import type { GameMapManager } from '../mapManager/mapManager';
-import { tileSize } from '../mapManager/tileSize';
+import { getTileSize } from '../mapManager/tileSize';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
-
-const playerSpeed = tileSize * 4; //px / s
 
 export const tickPlayerMovement = (
 	keyManager: KeyboardManager,
@@ -11,6 +9,7 @@ export const tickPlayerMovement = (
 	delta: number,
 	objectiveManager: ObjectiveManager
 ) => {
+	const playerSpeed = getTileSize() * 4; //px / s
 	const realDelta = delta / 1_000;
 	if (keyManager.isKeyActive('S') || keyManager.isKeyActive('arrowdown')) {
 		mapManager.addPlayerPosition(0, realDelta * playerSpeed);

@@ -8,7 +8,7 @@
 	import groundTile from '$lib/assets/ground.png';
 	import { KeyboardManager } from './keyboardManager';
 	import { tickPlayerMovement } from './playerManager/tickPlayerMovement';
-	import { tileSize } from './mapManager/tileSize';
+	import { getTileSize } from './mapManager/tileSize';
 	import { renderTiles } from './renderHelpers/renderTiles';
 	import { imageManipulationValues } from './renderHelpers/imageManipulationValues';
 	import type { TileManager } from './mapManager/tileManager';
@@ -68,8 +68,8 @@
 					const imageManipulation = imageManipulationValues[mapManager.getRotationDirection()];
 					ctx.save();
 					ctx.translate(
-						cPos.tile.x * tileSize - offsets.xOffsetPx,
-						cPos.tile.y * tileSize - offsets.yOffsetPx
+						cPos.tile.x * getTileSize() - offsets.xOffsetPx,
+						cPos.tile.y * getTileSize() - offsets.yOffsetPx
 					);
 					ctx.rotate(imageManipulation.r);
 					ctx.globalAlpha = 0.5;
@@ -78,8 +78,8 @@
 						buildingImage,
 						imageManipulation.xOffset,
 						imageManipulation.yOffset,
-						tileSize,
-						tileSize
+						getTileSize(),
+						getTileSize()
 					);
 					ctx.restore();
 				}
@@ -112,10 +112,10 @@
 
 				ctx.drawImage(
 					cursorHtmlImage,
-					cPos.tile.x * tileSize - offsets.xOffsetPx,
-					cPos.tile.y * tileSize - offsets.yOffsetPx,
-					tileSize,
-					tileSize
+					cPos.tile.x * getTileSize() - offsets.xOffsetPx,
+					cPos.tile.y * getTileSize() - offsets.yOffsetPx,
+					getTileSize(),
+					getTileSize()
 				);
 
 				//render player
@@ -124,10 +124,10 @@
 				mapManager.getPlayerData();
 				ctx.drawImage(
 					playerHtmlImage,
-					canvas.clientWidth / 2 - tileSize / 2,
-					canvas.clientHeight / 2 - tileSize / 2,
-					tileSize,
-					tileSize
+					canvas.clientWidth / 2 - getTileSize() / 2,
+					canvas.clientHeight / 2 - getTileSize() / 2,
+					getTileSize(),
+					getTileSize()
 				);
 
 				// render ui elements

@@ -3,7 +3,7 @@ import { type GameBuildingName } from '../gameBuildings/gameBuildings';
 import type { GameBuilding } from '../gameBuildings/utils/BehaviorBase';
 import { UiManager } from '../uiManager/uiManager';
 import { TileManager, type FacingDirection, type TerrainType } from './tileManager';
-import { tileSize } from './tileSize';
+import { getTileSize } from './tileSize';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 
 export const itemList = [
@@ -156,8 +156,8 @@ export class GameMapManager {
 				y: this.playerData.y
 			},
 			tile: {
-				x: Math.floor(this.playerData.x / tileSize),
-				y: Math.floor(this.playerData.y / tileSize)
+				x: Math.floor(this.playerData.x / getTileSize()),
+				y: Math.floor(this.playerData.y / getTileSize())
 			}
 		};
 	}
@@ -166,8 +166,8 @@ export class GameMapManager {
 		this.playerData.x += x;
 		this.playerData.y += y;
 
-		this.playerData.x = Math.max(0, Math.min((this.size - 1) * tileSize, this.playerData.x));
-		this.playerData.y = Math.max(0, Math.min((this.size - 1) * tileSize, this.playerData.y));
+		this.playerData.x = Math.max(0, Math.min((this.size - 1) * getTileSize(), this.playerData.x));
+		this.playerData.y = Math.max(0, Math.min((this.size - 1) * getTileSize(), this.playerData.y));
 	}
 
 	setCursorPosition(x: number, y: number) {
@@ -176,8 +176,8 @@ export class GameMapManager {
 	}
 
 	getTileDetails() {
-		const xTiles = Math.ceil(this.canvasDimensions.width / tileSize);
-		const yTiles = Math.ceil(this.canvasDimensions.height / tileSize);
+		const xTiles = Math.ceil(this.canvasDimensions.width / getTileSize());
+		const yTiles = Math.ceil(this.canvasDimensions.height / getTileSize());
 
 		const xTilesHalf = Math.floor(xTiles / 2);
 		const yTilesHalf = Math.floor(yTiles / 2);
@@ -193,10 +193,10 @@ export class GameMapManager {
 	getOffsets() {
 		const playerPos = this.getPlayerPosition();
 		const xOffsetTiles = playerPos.tile.x;
-		const xOffsetPx = playerPos.raw.x % tileSize;
+		const xOffsetPx = playerPos.raw.x % getTileSize();
 
 		const yOffsetTiles = playerPos.tile.y;
-		const yOffsetPx = playerPos.raw.y % tileSize;
+		const yOffsetPx = playerPos.raw.y % getTileSize();
 
 		return {
 			xOffsetTiles,
@@ -213,8 +213,8 @@ export class GameMapManager {
 				y: this.cursorData.y
 			},
 			tile: {
-				x: Math.floor((this.cursorData.x + (this.playerData.x % tileSize)) / tileSize),
-				y: Math.floor((this.cursorData.y + (this.playerData.y % tileSize)) / tileSize)
+				x: Math.floor((this.cursorData.x + (this.playerData.x % getTileSize())) / getTileSize()),
+				y: Math.floor((this.cursorData.y + (this.playerData.y % getTileSize())) / getTileSize())
 			}
 		};
 	}

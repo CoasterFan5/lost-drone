@@ -1,5 +1,5 @@
 import type { FacingDirection } from '../mapManager/tileManager';
-import { tileSize } from '../mapManager/tileSize';
+import { getTileSize } from '../mapManager/tileSize';
 
 export const imageManipulationValues: Record<
 	FacingDirection,
@@ -17,16 +17,16 @@ export const imageManipulationValues: Record<
 	e: {
 		r: Math.PI / 2,
 		xOffset: 0,
-		yOffset: -tileSize
+		yOffset: -getTileSize()
 	},
 	s: {
 		r: Math.PI,
-		xOffset: -tileSize,
-		yOffset: -tileSize
+		xOffset: -getTileSize(),
+		yOffset: -getTileSize()
 	},
 	w: {
 		r: Math.PI * 1.5,
-		xOffset: -tileSize,
+		xOffset: -getTileSize(),
 		yOffset: 0
 	}
 };
