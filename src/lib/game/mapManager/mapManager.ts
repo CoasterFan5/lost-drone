@@ -155,8 +155,8 @@ export class GameMapManager {
 				y: this.playerData.y
 			},
 			tile: {
-				x: Math.floor(this.playerData.x / 32),
-				y: Math.floor(this.playerData.y / 32)
+				x: Math.floor(this.playerData.x / tileSize),
+				y: Math.floor(this.playerData.y / tileSize)
 			}
 		};
 	}

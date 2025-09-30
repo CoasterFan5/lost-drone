@@ -51,11 +51,11 @@ export const renderTiles = ({
 				if (t.data.terrain) {
 					switch (t.data.terrain) {
 						case 'iron_ore': {
-							ctx.drawImage(ironOreTileImage, trueRenderX, trueRenderY);
+							ctx.drawImage(ironOreTileImage, trueRenderX, trueRenderY, tileSize, tileSize);
 							break;
 						}
 						case 'copper_ore': {
-							ctx.drawImage(copperOreTileImage, trueRenderX, trueRenderY);
+							ctx.drawImage(copperOreTileImage, trueRenderX, trueRenderY, tileSize, tileSize);
 							break;
 						}
 					}
@@ -68,13 +68,13 @@ export const renderTiles = ({
 					ctx.translate(trueRenderX, trueRenderY);
 					ctx.rotate(manipulationValues.r);
 					ctx.translate(manipulationValues.xOffset, manipulationValues.yOffset);
-					ctx.drawImage(renderer, 0, 0);
+					ctx.drawImage(renderer, 0, 0, tileSize, tileSize);
 					ctx.restore();
 				}
 
 				if (t.data.holding) {
 					const img = itemImageMap[t.data.holding];
-					ctx.drawImage(img, trueRenderX, trueRenderY);
+					ctx.drawImage(img, trueRenderX, trueRenderY, tileSize, tileSize);
 				}
 			}
 		}

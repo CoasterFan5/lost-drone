@@ -74,7 +74,13 @@
 					ctx.rotate(imageManipulation.r);
 					ctx.globalAlpha = 0.5;
 					const buildingImage = b.getRenderer();
-					ctx.drawImage(buildingImage, imageManipulation.xOffset, imageManipulation.yOffset);
+					ctx.drawImage(
+						buildingImage,
+						imageManipulation.xOffset,
+						imageManipulation.yOffset,
+						tileSize,
+						tileSize
+					);
 					ctx.restore();
 				}
 
@@ -107,7 +113,9 @@
 				ctx.drawImage(
 					cursorHtmlImage,
 					cPos.tile.x * tileSize - offsets.xOffsetPx,
-					cPos.tile.y * tileSize - offsets.yOffsetPx
+					cPos.tile.y * tileSize - offsets.yOffsetPx,
+					tileSize,
+					tileSize
 				);
 
 				//render player
@@ -117,7 +125,9 @@
 				ctx.drawImage(
 					playerHtmlImage,
 					canvas.clientWidth / 2 - tileSize / 2,
-					canvas.clientHeight / 2 - tileSize / 2
+					canvas.clientHeight / 2 - tileSize / 2,
+					tileSize,
+					tileSize
 				);
 
 				// render ui elements
