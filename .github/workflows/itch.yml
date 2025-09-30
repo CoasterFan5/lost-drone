@@ -51,4 +51,4 @@ jobs:
           CHANNEL: HTML
           ITCH_GAME: lost-drone-potocol
           ITCH_USER: coasterfan5
-          PACKAGE: itch.html
+          PACKAGE: index.html
