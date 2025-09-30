@@ -23,7 +23,7 @@ export class Crafter extends GameBuilding {
 		}
 	};
 
-	private selectedRecipie?: RecipieName = 'ironGear';
+	private selectedRecipie: RecipieName | undefined = undefined;
 
 	constructor() {
 		super();
@@ -136,7 +136,7 @@ export class Crafter extends GameBuilding {
 					count: 0
 				};
 			} else {
-				this.storage[req].count += 2;
+				this.storage[req].max += 2;
 			}
 		}
 		this.selectedRecipie = name;
@@ -151,5 +151,9 @@ export class Crafter extends GameBuilding {
 			}
 		}
 		return i;
+	}
+
+	getRecipie(): RecipieName | undefined {
+		return this.selectedRecipie;
 	}
 }
