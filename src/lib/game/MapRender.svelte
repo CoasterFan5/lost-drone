@@ -13,14 +13,20 @@
 	import { imageManipulationValues } from './renderHelpers/imageManipulationValues';
 	import type { TileManager } from './mapManager/tileManager';
 	import { itemImageMap } from './colorMaps';
+	import { ObjectiveManager, type ObjectiveTarget } from './objectiveManager/objectiveManager';
 
 	let uiKey = $state(0);
 	let hoveringTile: TileManager | undefined = $state(undefined);
+	let objectiveName: string = $state('');
+	let target: ObjectiveTarget | undefined = $state();
+	let progress: number = $state();
 
 	const {
 		mapManager,
-		keyboardManager
+		keyboardManager,
+		objectiveManager
 	}: {
+		objectiveManager: ObjectiveManager;
 		mapManager: GameMapManager;
 		keyboardManager: KeyboardManager;
 	} = $props();
@@ -118,6 +124,11 @@
 				if (mapManager.uiManager.needsRendering()) {
 					uiKey += 1;
 				}
+
+				//objectives
+				objectiveName = objectiveManager.getCurrentObjectiveName();
+				target = objectiveManager.getCurrentTarget();
+				progress = objectiveManager.getProgress();
 			}
 		}
 	};
@@ -125,8 +136,8 @@
 	let lastD = 0;
 	const renderTickWrap = (d: number) => {
 		const diff = d - lastD;
-		mapManager.tick(diff, d);
-		tickPlayerMovement(keyboardManager, mapManager, diff);
+		mapManager.tick(diff, d, objectiveManager);
+		tickPlayerMovement(keyboardManager, mapManager, diff, objectiveManager);
 		lastD = d;
 
 		if (diff > 16.6666666667) {
@@ -153,8 +164,11 @@
 {/key}
 <div class="hoverManager">
 	<div class="section">
-		<p>Objective: <span class="objective">Map Planet</span></p>
-		<div class="progress"></div>
+		<p>Objective: <span class="objective">{objectiveName}</span></p>
+		<p>{target?.label}</p>
+		{#if target?.start != undefined}
+			<div class="progress" style="--p: {progress * 100}%"></div>
+		{/if}
 	</div>
 	{#if hoveringTile?.data.terrain != undefined}
 		<div class="section">
@@ -214,7 +228,7 @@
 				position: absolute;
 				left: 0px;
 				top: 0px;
-				width: 1%;
+				width: var(--p);
 				height: 100%;
 				background: #008000;
 				border-radius: 0.1rem;

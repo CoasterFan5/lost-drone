@@ -27,7 +27,7 @@ export class Furnace extends GameBuilding {
 		this.cooldown = this.DEFAULT_COOLDOWN;
 	}
 
-	tick({ thisTile, mapManager, x, y, delta }: TickMethodParams) {
+	tick({ thisTile, mapManager, x, y, delta, objectiveManager }: TickMethodParams) {
 		this.cooldown -= delta;
 		if (this.cooldown <= 0) {
 			const nextTile = getNextTile(x, y, thisTile.data.facing, mapManager);
@@ -41,6 +41,7 @@ export class Furnace extends GameBuilding {
 				if (product) {
 					nextTile.setHolding(product);
 					thisTile.clearHolding();
+					objectiveManager.addScoreToObjectiveTracker('smelt');
 				}
 			}
 		}

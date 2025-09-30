@@ -33,7 +33,7 @@ export class Crafter extends GameBuilding {
 		return new Crafter();
 	}
 
-	override tick({ x, y, thisTile, mapManager }: TickMethodParams) {
+	override tick({ x, y, thisTile, mapManager, objectiveManager }: TickMethodParams) {
 		if (this.selectedRecipie) {
 			const recipie = craftingRecipies[this.selectedRecipie];
 
@@ -61,6 +61,9 @@ export class Crafter extends GameBuilding {
 				const nextTile = getNextTile(x, y, thisTile.data.facing, mapManager);
 				if (nextTile && nextTile.canHoldItem(product)) {
 					nextTile.setHolding(product);
+					if (product == 'circuitBoard') {
+						objectiveManager.addScoreToObjectiveTracker('craft_circuit_board');
+					}
 					for (const item of recipie.requirements) {
 						if (this.storage[item]) {
 							this.storage[item].count -= 1;

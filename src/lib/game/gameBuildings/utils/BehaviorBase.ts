@@ -1,11 +1,13 @@
 import type { GameItem, GameMapManager } from '$lib/game/mapManager/mapManager';
 import type { TileManager } from '$lib/game/mapManager/tileManager';
+import type { ObjectiveManager } from '$lib/game/objectiveManager/objectiveManager';
 import type { UiManager } from '$lib/game/uiManager/uiManager';
 import type { UiRenderType } from '$lib/game/uiManager/uiRenderType';
 
 export type TickMethodParams = {
 	thisTile: TileManager;
 	mapManager: GameMapManager;
+	objectiveManager: ObjectiveManager;
 	x: number;
 	y: number;
 	tickId: number;

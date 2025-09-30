@@ -4,6 +4,7 @@ import type { GameBuilding } from '../gameBuildings/utils/BehaviorBase';
 import { UiManager } from '../uiManager/uiManager';
 import { TileManager, type FacingDirection, type TerrainType } from './tileManager';
 import { tileSize } from './tileSize';
+import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 
 export const itemList = [
 	'ironOre',
@@ -117,11 +118,12 @@ export class GameMapManager {
 		this.canvasDimensions.height = height;
 	}
 
-	tick(delta: number, tickId: number) {
+	tick(delta: number, tickId: number, objectiveManager: ObjectiveManager) {
 		for (const item in this.tickables) {
 			const tile = this.tickables[item];
 			tile.tileManager.tick({
 				mapManager: this,
+				objectiveManager,
 				x: tile.x,
 				y: tile.y,
 				delta,

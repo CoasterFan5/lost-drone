@@ -3,6 +3,7 @@
 	import { GameMapManager } from '$lib/game/mapManager/mapManager';
 	import MapRender from '$lib/game/MapRender.svelte';
 	import Hotbar from './hotbar/Hotbar.svelte';
+	import { ObjectiveManager } from './objectiveManager/objectiveManager';
 
 	const {
 		map
@@ -10,6 +11,7 @@
 		map: GameMapManager;
 	} = $props();
 
+	const objectiveManager = new ObjectiveManager();
 	const keyboardManager = new KeyboardManager();
 
 	$effect(() => {
@@ -33,7 +35,7 @@
 	});
 </script>
 
-<MapRender mapManager={map} {keyboardManager} />
+<MapRender mapManager={map} {keyboardManager} {objectiveManager} />
 <Hotbar mapManager={map} />
 
 <style lang="scss">

@@ -1,4 +1,5 @@
 import type { GameBuilding } from '../gameBuildings/utils/BehaviorBase';
+import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 import type { GameItem, GameMapManager } from './mapManager';
 
 export type FacingDirection = 'n' | 'e' | 's' | 'w';
@@ -21,7 +22,14 @@ export class TileManager {
 		this.data = args;
 	}
 
-	tick(args: { mapManager: GameMapManager; x: number; y: number; delta: number; tickId: number }) {
+	tick(args: {
+		mapManager: GameMapManager;
+		objectiveManager: ObjectiveManager;
+		x: number;
+		y: number;
+		delta: number;
+		tickId: number;
+	}) {
 		if (this.data.building) {
 			this.data.building.tick({ ...args, ...{ thisTile: this } });
 			this.data.lastTouchedByTick = args.tickId;

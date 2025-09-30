@@ -28,13 +28,16 @@ export class Miner extends GameBuilding {
 		return new Miner();
 	}
 
-	tick({ thisTile, mapManager, x, y, delta }: TickMethodParams) {
+	tick({ thisTile, mapManager, x, y, delta, objectiveManager }: TickMethodParams) {
 		this.cooldown -= delta;
 		if (this.cooldown <= 0) {
 			const nt = getNextTile(x, y, thisTile.data.facing, mapManager);
 			if (nt && !nt.data.holding && nt.data.building) {
 				if (!!thisTile.data.terrain && terrainOresMap[thisTile.data.terrain]) {
 					nt.setHolding(terrainOresMap[thisTile.data.terrain]!);
+					if (thisTile.data.terrain == 'iron_ore') {
+						objectiveManager.addScoreToObjectiveTracker('iron_ore_harvested');
+					}
 				}
 				this.cooldown = this.DEFAULT_COOLDOWN;
 			}
