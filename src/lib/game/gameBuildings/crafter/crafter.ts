@@ -11,48 +11,15 @@ import {
 import { getNextTile } from '../utils/getDirectionTile';
 import CrafterUi from './CrafterUi.svelte';
 import { craftingRecipies, type RecipieName } from './recipies';
-import type { TileManager } from '$lib/game/mapManager/tileManager';
 
 let image: HTMLImageElement | undefined = undefined;
 
 export class Crafter extends GameBuilding {
 	name = 'Crafter';
-	private storage: Record<GameItem, { count: number; max: number }> = {
-		ironOre: {
-			count: 0,
-			max: 0
-		},
+	private storage: Partial<Record<GameItem, { count: number; max: number }>> = {
 		ironPlate: {
-			count: 0,
-			max: 10
-		},
-		ironGear: {
-			count: 0,
-			max: 10
-		},
-		ironRod: {
-			count: 0,
-			max: 10
-		},
-		copperOre: {
-			count: 0,
-			max: 10
-		},
-		copperPlate: {
-			count: 0,
-			max: 10
-		},
-		circuitBoard: {
-			count: 0,
-			max: 3
-		},
-		dataDrive: {
-			count: 0,
-			max: 3
-		},
-		mappingData: {
-			count: 0,
-			max: 3
+			max: 4,
+			count: 0
 		}
 	};
 
@@ -74,16 +41,18 @@ export class Crafter extends GameBuilding {
 			let allowed = true;
 
 			for (const item of recipie.requirements) {
-				if (!realCounts[item]) {
-					realCounts[item] = {
-						seen: true,
-						realCount: this.storage[item].count
-					};
-				}
-				realCounts[item].realCount -= 1;
-				if (realCounts[item].realCount < 0) {
-					allowed = false;
-					break;
+				if (this.storage[item]) {
+					if (!realCounts[item]) {
+						realCounts[item] = {
+							seen: true,
+							realCount: this.storage[item].count
+						};
+					}
+					realCounts[item].realCount -= 1;
+					if (realCounts[item].realCount < 0) {
+						allowed = false;
+						break;
+					}
 				}
 			}
 
@@ -93,7 +62,9 @@ export class Crafter extends GameBuilding {
 				if (nextTile && nextTile.canHoldItem(product)) {
 					nextTile.setHolding(product);
 					for (const item of recipie.requirements) {
-						this.storage[item].count -= 1;
+						if (this.storage[item]) {
+							this.storage[item].count -= 1;
+						}
 					}
 				}
 			}
@@ -104,8 +75,10 @@ export class Crafter extends GameBuilding {
 
 	override postPlaceAction({ thisTile }: PlaceActionParams): void {
 		if (thisTile.data.holding) {
-			this.storage[thisTile.data.holding].count += 1;
-			thisTile.clearHolding();
+			if (this.storage[thisTile.data.holding]) {
+				this.storage[thisTile.data.holding]!.count += 1;
+				thisTile.clearHolding();
+			}
 		}
 	}
 
@@ -119,6 +92,10 @@ export class Crafter extends GameBuilding {
 
 	override canAcceptItem({ tile, itemName }: CanAcceptItemParams): boolean {
 		if (tile.data.holding) {
+			return false;
+		}
+
+		if (!this.storage[itemName]) {
 			return false;
 		}
 
@@ -148,6 +125,17 @@ export class Crafter extends GameBuilding {
 	}
 
 	setRecipie(name: RecipieName) {
+		this.storage = {};
+		for (const req of craftingRecipies[name].requirements) {
+			if (!this.storage[req]) {
+				this.storage[req] = {
+					max: 2,
+					count: 0
+				};
+			} else {
+				this.storage[req].count += 2;
+			}
+		}
 		this.selectedRecipie = name;
 	}
 
@@ -155,7 +143,7 @@ export class Crafter extends GameBuilding {
 		const i: [GameItem, number][] = [];
 		for (const invItem in this.storage) {
 			const record = this.storage[invItem as GameItem];
-			if (record.count > 0) {
+			if (record && record.count > 0) {
 				i.push([invItem as GameItem, record.count]);
 			}
 		}

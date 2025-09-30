@@ -13,6 +13,7 @@
 
 <style lang="scss">
 	:global(body) {
+		margin: 0px;
 		font-family: 'IBM Plex Mono', monospace;
 		--gray: #323232;
 		--gray2: #414a4c;

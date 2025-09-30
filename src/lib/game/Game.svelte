@@ -4,8 +4,11 @@
 	import MapRender from '$lib/game/MapRender.svelte';
 	import Hotbar from './hotbar/Hotbar.svelte';
 
-	const map = new GameMapManager();
-	map.generate(100);
+	const {
+		map
+	}: {
+		map: GameMapManager;
+	} = $props();
 
 	const keyboardManager = new KeyboardManager();
 
