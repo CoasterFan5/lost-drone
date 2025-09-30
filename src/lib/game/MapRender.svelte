@@ -19,7 +19,7 @@
 	let hoveringTile: TileManager | undefined = $state(undefined);
 	let objectiveName: string = $state('');
 	let target: ObjectiveTarget | undefined = $state();
-	let progress: number = $state();
+	let progress: number = $state(0);
 
 	const {
 		mapManager,
