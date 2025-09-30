@@ -266,33 +266,47 @@ export class GameMapManager {
 		return this.cursorData.selectedDirection;
 	}
 
-	handleClick() {
+	handleClick(e: MouseEvent) {
 		const currentTile = this.getSelectedTile();
-		if (currentTile) {
-			const inRange = currentTile.inPlayerPlaceRange({ map: this });
-			if (this.cursorData.selectedBuilding) {
-				const validPlacement = this.cursorData.selectedBuilding.isValidPlacement({
-					tile: currentTile,
-					gameManager: this
-				});
 
-				if (validPlacement && inRange) {
-					this.place(
-						new TileManager({
-							building: this.cursorData.selectedBuilding.new(),
-							facing: this.cursorData.selectedDirection,
-							x: currentTile.data.x,
-							y: currentTile.data.y,
-							terrain: currentTile.data.terrain
-						}),
-						currentTile.data.x,
-						currentTile.data.y
-					);
+		if (currentTile) {
+			if (e.button == 0) {
+				const inRange = currentTile.inPlayerPlaceRange({ map: this });
+				if (this.cursorData.selectedBuilding) {
+					const validPlacement = this.cursorData.selectedBuilding.isValidPlacement({
+						tile: currentTile,
+						gameManager: this
+					});
+
+					if (validPlacement && inRange) {
+						this.place(
+							new TileManager({
+								building: this.cursorData.selectedBuilding.new(),
+								facing: this.cursorData.selectedDirection,
+								x: currentTile.data.x,
+								y: currentTile.data.y,
+								terrain: currentTile.data.terrain
+							}),
+							currentTile.data.x,
+							currentTile.data.y
+						);
+					}
+				} else {
+					currentTile.onClick({
+						mapManager: this
+					});
 				}
-			} else {
-				currentTile.onClick({
-					mapManager: this
-				});
+			} else if (e.button == 2) {
+				this.place(
+					new TileManager({
+						terrain: currentTile.data.terrain,
+						facing: 'n',
+						x: currentTile.data.x,
+						y: currentTile.data.y
+					}),
+					currentTile.data.x,
+					currentTile.data.y
+				);
 			}
 		}
 	}

@@ -25,8 +25,12 @@
 			map.setCursorPosition(e.clientX, e.clientY);
 		});
 
-		document.addEventListener('click', () => {
-			map.handleClick();
+		document.addEventListener('contextmenu', (e) => {
+			e.preventDefault();
+		});
+
+		document.addEventListener('mousedown', (e) => {
+			map.handleClick(e);
 		});
 	});
 
