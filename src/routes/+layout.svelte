@@ -1,5 +1,5 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/Player.png';
 	import '@fontsource/ibm-plex-mono';
 
 	let { children } = $props();
