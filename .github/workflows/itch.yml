@@ -44,3 +44,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           title: Release
+
+      - uses: yeslayla/butler-publish-itchio-action@master
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_CREDENTIALS }}
+          CHANNEL: HTML
+          ITCH_GAME: lost-drone-potocol
+          ITCH_USER: coasterfan5
+          PACKAGE: build.zip
