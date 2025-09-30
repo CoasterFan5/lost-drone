@@ -1,38 +1,12 @@
-# sv
+# Lost Drone Protocol
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+You are officially lost.
+After being abandoned by the Starship, your only mission is to create a factory on this baron planet and re-establish communication with Starship to get them to come find you.
 
-## Creating a project
+## Play
+**Play on coasterfan5.com (recomended)**: [lost-drone.coasterfan5.com](https://lost-drone.coasterfan5.com)
 
-If you're seeing this, you've probably already done this step. Congrats!
+<iframe frameborder="0" src="https://itch.io/embed/3923259?linkback=true&amp;border_width=0&amp;bg_color=323232&amp;fg_color=ffffff&amp;link_color=FFA500&amp;border_color=5b5b5b" width="550" height="165"></iframe>
 
-```sh
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Bug Reports
+See issues tab.
