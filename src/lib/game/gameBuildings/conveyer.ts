@@ -6,6 +6,8 @@ export class Conveyer extends GameBuilding {
 	private DEFAULT_COOLDOWN = 1_000;
 	private cooldown = 0;
 	name = 'Conveyer';
+	description = 'Moves items';
+
 	private htmlImage: HTMLImageElement | undefined = undefined;
 
 	constructor() {

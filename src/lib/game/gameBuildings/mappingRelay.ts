@@ -8,6 +8,7 @@ import {
 
 export class MappingRelay extends GameBuilding {
 	name = 'Mapping Relay';
+	description = 'Takes in data drives and outputs mapping data';
 	private htmlImage: HTMLImageElement | undefined = undefined;
 	private cooldown = 0;
 	private DEFAULT_COOLDOWN = 5_000;

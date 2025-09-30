@@ -8,6 +8,7 @@ export class Splitter extends GameBuilding {
 	private cooldown = 0;
 	private htmlImage: HTMLImageElement | undefined = undefined;
 	private lastDirection: 'top' | 'side' = 'side';
+	description = 'Distributes items to both sides';
 
 	constructor() {
 		super();

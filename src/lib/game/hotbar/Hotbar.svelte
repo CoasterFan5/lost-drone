@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { gameBuildingBehavior, gameBuildings } from '../gameBuildings/gameBuildings';
+	import type { GameBuilding } from '../gameBuildings/utils/BehaviorBase';
 	import type { GameMapManager } from '../mapManager/mapManager';
 
 	const {
@@ -8,17 +9,19 @@
 		mapManager: GameMapManager;
 	} = $props();
 
-	let hoveredName: string | undefined = $state(undefined);
+	let hovered: GameBuilding | undefined = $state(undefined);
 </script>
 
 <div class="wrap">
-	{#if hoveredName}
-		{hoveredName}
+	{#if hovered}
+		<p>{hovered.name}</p>
+
+		{hovered.description}
 	{/if}
 	<div
 		class="buildings"
 		onmouseleave={() => {
-			hoveredName = undefined;
+			hovered = undefined;
 		}}
 		role={null}
 	>
@@ -33,7 +36,7 @@
 					mapManager.setSelectedBuilding(building);
 				}}
 				onmouseenter={() => {
-					hoveredName = building.name;
+					hovered = building;
 				}}
 			>
 				<img src={buildingImage.src} alt={b} />

@@ -14,6 +14,7 @@ const productMap: Partial<Record<GameItem, GameItem>> = {
 
 export class Furnace extends GameBuilding {
 	name = 'Furnace';
+	description = 'Smelts ores';
 	private htmlImage: HTMLImageElement | undefined = undefined;
 	private cooldown = 0;
 	private DEFAULT_COOLDOWN = 2_000;

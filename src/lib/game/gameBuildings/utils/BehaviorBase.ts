@@ -38,6 +38,7 @@ export type GetUiParams = {
 export abstract class GameBuilding {
 	private COOLDOWN_TIME = 5_000;
 	abstract name: string;
+	abstract description: string;
 
 	constructor() {}
 

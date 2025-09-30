@@ -16,6 +16,7 @@ const terrainOresMap: Partial<Record<TerrainType, GameItem>> = {
 
 export class Miner extends GameBuilding {
 	name = 'Miner';
+	description = "Mines ores it's placed on top of";
 	private htmlImage: HTMLImageElement | undefined = undefined;
 	private cooldown = 0;
 	private DEFAULT_COOLDOWN = 5_000;

@@ -190,7 +190,8 @@
 	}
 
 	.logWrap {
-		width: 80ch;
+		width: 100%;
+		max-width: 80ch;
 		height: 90dvh;
 		position: relative;
 	}

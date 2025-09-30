@@ -16,6 +16,7 @@ let image: HTMLImageElement | undefined = undefined;
 
 export class Crafter extends GameBuilding {
 	name = 'Crafter';
+	description = 'Crafts items. Click to select recipie.';
 	private storage: Partial<Record<GameItem, { count: number; max: number }>> = {
 		ironPlate: {
 			max: 4,
