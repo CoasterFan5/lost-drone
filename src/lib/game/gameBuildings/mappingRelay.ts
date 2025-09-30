@@ -22,7 +22,7 @@ export class MappingRelay extends GameBuilding {
 		return new MappingRelay();
 	}
 
-	tick({ thisTile, mapManager, x, y, delta }: TickMethodParams) {
+	tick({ thisTile, mapManager, x, y, delta, objectiveManager }: TickMethodParams) {
 		this.cooldown -= delta;
 		if (this.cooldown <= 0) {
 			const nextTile = getNextTile(x, y, thisTile.data.facing, mapManager);
@@ -32,6 +32,7 @@ export class MappingRelay extends GameBuilding {
 				thisTile.data.holding == 'dataDrive' &&
 				nextTile.canHoldItem('mappingData')
 			) {
+				objectiveManager.addScoreToObjectiveTracker('map');
 				nextTile.setHolding('mappingData');
 				thisTile.clearHolding();
 			}

@@ -1,9 +1,14 @@
+import { objectives } from './objectives';
+
 export const trackers = [
 	'wasd',
 	'iron_ore_harvested',
 	'smelt',
 	'craft_circuit_board',
-	'map'
+	'map',
+	'com',
+	'communicationsRelay',
+	'impossible'
 ] as const;
 type RequirementTracker = Partial<Record<ObjectiveTracker, number>>;
 
@@ -15,64 +20,6 @@ export type ObjectiveTarget = {
 	start?: RequirementTracker;
 	requirements: RequirementTracker;
 };
-
-const objectives: {
-	name: string;
-	targets: ObjectiveTarget[];
-}[] = [
-	{
-		name: 'Tutorial',
-		targets: [
-			{
-				name: 'wasd',
-				label: 'Usd WASD to move around.',
-				start: {
-					wasd: 500
-				},
-				requirements: {
-					wasd: 500
-				}
-			},
-			{
-				name: 'building',
-				label: 'Use the bottom bar to build a miner and harvest one iron ore.',
-				requirements: {
-					iron_ore_harvested: 1
-				}
-			},
-			{
-				name: 'smelting',
-				label: 'Smelt the iron ore in a furnace',
-				requirements: {
-					smelt: 1
-				}
-			},
-			{
-				name: 'crafting',
-				label: 'Craft 3 circuit boards',
-				start: {
-					craft_circuit_board: 3
-				},
-				requirements: {
-					craft_circuit_board: 3
-				}
-			}
-		]
-	},
-	{
-		name: 'Map the world',
-		targets: [
-			{
-				name: '10map',
-				label: 'Make 10 mapping data items',
-				start: {
-					map: 10
-				},
-				requirements: { map: 10 }
-			}
-		]
-	}
-];
 
 export class ObjectiveManager {
 	private currentObjective = 0;

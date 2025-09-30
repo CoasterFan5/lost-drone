@@ -16,7 +16,8 @@ export const itemList = [
 	'circuitBoard',
 	'dataDrive',
 	'mappingData',
-	'communicationsModule'
+	'communicationsModule',
+	'mappingModule'
 ] as const;
 export type GameItem = (typeof itemList)[number];
 

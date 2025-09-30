@@ -9,6 +9,7 @@ import circuitBoardImageData from '$lib/assets/items/CircuitBoard.png';
 import dataDriveImageData from '$lib/assets/items/Data Drive.png';
 import mappingDataImageData from '$lib/assets/items/Mapping Data.png';
 import communicationModuleImageData from '$lib/assets/items/Communication Module.png';
+import mappingModuleImageData from '$lib/assets/items/Mapping Module.png';
 
 const ironOreImage = new Image();
 ironOreImage.src = ironOreImageData;
@@ -40,6 +41,9 @@ mappingDataImage.src = mappingDataImageData;
 const communicationModuleImage = new Image();
 communicationModuleImage.src = communicationModuleImageData;
 
+const mappingModuleImage = new Image();
+mappingModuleImage.src = mappingModuleImageData;
+
 export const itemImageMap: Record<GameItem, HTMLImageElement> = {
 	ironOre: ironOreImage,
 	ironPlate: ironPlateImage,
@@ -50,5 +54,6 @@ export const itemImageMap: Record<GameItem, HTMLImageElement> = {
 	circuitBoard: circuitBoardImage,
 	dataDrive: dataDriveImage,
 	mappingData: mappingDataImage,
-	communicationsModule: communicationModuleImage
+	communicationsModule: communicationModuleImage,
+	mappingModule: mappingModuleImage
 };

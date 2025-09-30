@@ -1,3 +1,4 @@
+import { CommunicationsRelay } from './communicationsRelay';
 import { Conveyer } from './conveyer';
 import { Crafter } from './crafter/crafter';
 import { Furnace } from './furnace';
@@ -12,7 +13,8 @@ export const gameBuildings = [
 	'Furnace',
 	'Splitter',
 	'Crafter',
-	'MappingRelay'
+	'MappingRelay',
+	'CommunicationRelay'
 ] as const;
 
 export type GameBuildingName = (typeof gameBuildings)[number];
@@ -23,5 +25,6 @@ export const gameBuildingBehavior: Record<GameBuildingName, new () => GameBuildi
 	Miner: Miner,
 	Splitter: Splitter,
 	Crafter: Crafter,
-	MappingRelay: MappingRelay
+	MappingRelay: MappingRelay,
+	CommunicationRelay: CommunicationsRelay
 };

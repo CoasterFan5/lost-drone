@@ -64,6 +64,8 @@ export class Crafter extends GameBuilding {
 					nextTile.setHolding(product);
 					if (product == 'circuitBoard') {
 						objectiveManager.addScoreToObjectiveTracker('craft_circuit_board');
+					} else if (product == 'communicationsModule') {
+						objectiveManager.addScoreToObjectiveTracker('com');
 					}
 					for (const item of recipie.requirements) {
 						if (this.storage[item]) {

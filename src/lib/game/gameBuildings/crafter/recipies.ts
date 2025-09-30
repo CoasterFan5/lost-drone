@@ -5,7 +5,8 @@ export const craftingRecipieNames = [
 	'ironRod',
 	'circuitBoard',
 	'dataDrive',
-	'communicationsModule'
+	'communicationsModule',
+	'mappingModule'
 ] as const;
 export type RecipieName = (typeof craftingRecipieNames)[number];
 
@@ -34,12 +35,17 @@ export const craftingRecipies: Record<
 	},
 	dataDrive: {
 		prettyName: 'Data Drive',
-		requirements: ['circuitBoard', 'ironPlate'],
+		requirements: ['circuitBoard', 'ironGear'],
 		product: 'dataDrive'
 	},
 	communicationsModule: {
 		prettyName: 'Communications Module',
 		requirements: ['dataDrive', 'ironRod'],
 		product: 'communicationsModule'
+	},
+	mappingModule: {
+		prettyName: 'Mapping Module',
+		requirements: ['communicationsModule', 'mappingData'],
+		product: 'mappingModule'
 	}
 } as const;
