@@ -1,6 +1,6 @@
 import type { GameItem } from '$lib/game/mapManager/mapManager';
 
-export const craftingRecipieNames = [
+export const craftingRecipeNames = [
 	'ironGear',
 	'ironRod',
 	'circuitBoard',
@@ -8,10 +8,10 @@ export const craftingRecipieNames = [
 	'communicationsModule',
 	'mappingModule'
 ] as const;
-export type RecipieName = (typeof craftingRecipieNames)[number];
+export type RecipeName = (typeof craftingRecipeNames)[number];
 
-export const craftingRecipies: Record<
-	RecipieName,
+export const craftingRecipes: Record<
+	RecipeName,
 	{
 		prettyName: string;
 		requirements: GameItem[];

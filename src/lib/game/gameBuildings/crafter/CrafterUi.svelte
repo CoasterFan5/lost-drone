@@ -3,7 +3,7 @@
 	import UiBase from '$lib/game/uiManager/UiBase.svelte';
 	import type { UiManager } from '$lib/game/uiManager/uiManager';
 	import type { Crafter } from './crafter';
-	import { craftingRecipieNames, craftingRecipies, type RecipieName } from './recipies';
+	import { craftingRecipeNames, craftingRecipes, type RecipeName } from './recipes';
 
 	const {
 		crafter,
@@ -13,31 +13,31 @@
 		crafter: Crafter;
 	} = $props();
 
-	let selectedRecipie: RecipieName | undefined = $state(crafter.getRecipie());
+	let selectedRecipe: RecipeName | undefined = $state(crafter.getRecipe());
 </script>
 
 <UiBase>
 	<div class="wrap">
-		<div class="recipieOptions">
-			{#each craftingRecipieNames as rName (rName)}
-				{@const recipieDetails = craftingRecipies[rName]}
+		<div class="recipeOptions">
+			{#each craftingRecipeNames as rName (rName)}
+				{@const recipeDetails = craftingRecipes[rName]}
 				<button
-					class="recipie itemBox"
+					class="recipe itemBox"
 					onclick={() => {
-						selectedRecipie = rName;
+						selectedRecipe = rName;
 					}}
 				>
-					<img src={itemImageMap[recipieDetails.product].src} alt={recipieDetails.product} />
+					<img src={itemImageMap[recipeDetails.product].src} alt={recipeDetails.product} />
 				</button>
 			{/each}
 		</div>
-		<div class="recipieDetails">
-			{#if selectedRecipie}
-				{@const recipieDetails = craftingRecipies[selectedRecipie]}
+		<div class="recipeDetails">
+			{#if selectedRecipe}
+				{@const recipeDetails = craftingRecipes[selectedRecipe]}
 				<div class="top">
-					<p>{recipieDetails.prettyName}</p>
-					<div class="recipieRequirements">
-						{#each recipieDetails.requirements as req, i (i)}
+					<p>{recipeDetails.prettyName}</p>
+					<div class="recipeRequirements">
+						{#each recipeDetails.requirements as req, i (i)}
 							<div class="inputs itemBox">
 								<img src={itemImageMap[req].src} alt={req} />
 							</div>
@@ -52,14 +52,14 @@
 						</div>
 
 						<div class="outputs itemBox">
-							<img src={itemImageMap[recipieDetails.product].src} alt={recipieDetails.product} />
+							<img src={itemImageMap[recipeDetails.product].src} alt={recipeDetails.product} />
 						</div>
 					</div>
 				</div>
 
 				<button
 					onclick={() => {
-						crafter.setRecipie(selectedRecipie!);
+						crafter.setRecipe(selectedRecipe!);
 						uiManager.clearUi();
 					}}
 				>
@@ -95,7 +95,7 @@
 		justify-content: center;
 	}
 
-	.recipieOptions {
+	.recipeOptions {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
 		width: 100%;
@@ -103,7 +103,7 @@
 		gap: 0.1rem;
 	}
 
-	.recipie {
+	.recipe {
 		all: unset;
 
 		padding: 0.25rem;
@@ -120,7 +120,7 @@
 		}
 	}
 
-	.recipieDetails {
+	.recipeDetails {
 		width: 30rem;
 		border-left: 1px solid black;
 		padding: 1rem;
@@ -156,7 +156,7 @@
 		}
 	}
 
-	.recipieRequirements {
+	.recipeRequirements {
 		display: flex;
 		flex-direction: row;
 		gap: 0.25rem;

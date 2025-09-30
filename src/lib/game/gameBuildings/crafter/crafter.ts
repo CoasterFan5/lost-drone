@@ -10,13 +10,13 @@ import {
 } from '../utils/BehaviorBase';
 import { getNextTile } from '../utils/getDirectionTile';
 import CrafterUi from './CrafterUi.svelte';
-import { craftingRecipies, type RecipieName } from './recipies';
+import { craftingRecipes, type RecipeName } from './recipes';
 
 let image: HTMLImageElement | undefined = undefined;
 
 export class Crafter extends GameBuilding {
 	name = 'Crafter';
-	description = 'Crafts items. Click to select recipie.';
+	description = 'Crafts items. Click to select recipe.';
 	private storage: Partial<Record<GameItem, { count: number; max: number }>> = {
 		ironPlate: {
 			max: 4,
@@ -24,7 +24,7 @@ export class Crafter extends GameBuilding {
 		}
 	};
 
-	private selectedRecipie: RecipieName | undefined = undefined;
+	private selectedRecipe: RecipeName | undefined = undefined;
 
 	constructor() {
 		super();
@@ -35,13 +35,13 @@ export class Crafter extends GameBuilding {
 	}
 
 	override tick({ x, y, thisTile, mapManager, objectiveManager }: TickMethodParams) {
-		if (this.selectedRecipie) {
-			const recipie = craftingRecipies[this.selectedRecipie];
+		if (this.selectedRecipe) {
+			const recipe = craftingRecipes[this.selectedRecipe];
 
 			const realCounts: Partial<Record<GameItem, { seen: boolean; realCount: number }>> = {};
 			let allowed = true;
 
-			for (const item of recipie.requirements) {
+			for (const item of recipe.requirements) {
 				if (this.storage[item]) {
 					if (!realCounts[item]) {
 						realCounts[item] = {
@@ -58,7 +58,7 @@ export class Crafter extends GameBuilding {
 			}
 
 			if (allowed) {
-				const product = recipie.product;
+				const product = recipe.product;
 				const nextTile = getNextTile(x, y, thisTile.data.facing, mapManager);
 				if (nextTile && nextTile.canHoldItem(product)) {
 					nextTile.setHolding(product);
@@ -67,7 +67,7 @@ export class Crafter extends GameBuilding {
 					} else if (product == 'communicationsModule') {
 						objectiveManager.addScoreToObjectiveTracker('com');
 					}
-					for (const item of recipie.requirements) {
+					for (const item of recipe.requirements) {
 						if (this.storage[item]) {
 							this.storage[item].count -= 1;
 						}
@@ -130,9 +130,9 @@ export class Crafter extends GameBuilding {
 		);
 	}
 
-	setRecipie(name: RecipieName) {
+	setRecipe(name: RecipeName) {
 		this.storage = {};
-		for (const req of craftingRecipies[name].requirements) {
+		for (const req of craftingRecipes[name].requirements) {
 			if (!this.storage[req]) {
 				this.storage[req] = {
 					max: 2,
@@ -142,7 +142,7 @@ export class Crafter extends GameBuilding {
 				this.storage[req].max += 2;
 			}
 		}
-		this.selectedRecipie = name;
+		this.selectedRecipe = name;
 	}
 
 	getInventory(): [GameItem, number][] {
@@ -156,7 +156,7 @@ export class Crafter extends GameBuilding {
 		return i;
 	}
 
-	getRecipie(): RecipieName | undefined {
-		return this.selectedRecipie;
+	getRecipe(): RecipeName | undefined {
+		return this.selectedRecipe;
 	}
 }
