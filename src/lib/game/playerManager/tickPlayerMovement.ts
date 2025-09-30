@@ -1,8 +1,9 @@
 import type { KeyboardManager } from '../keyboardManager';
 import type { GameMapManager } from '../mapManager/mapManager';
+import { tileSize } from '../mapManager/tileSize';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 
-const playerSpeed = 128; //px / s
+const playerSpeed = tileSize * 4; //px / s
 
 export const tickPlayerMovement = (
 	keyManager: KeyboardManager,

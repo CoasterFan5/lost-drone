@@ -6,6 +6,7 @@
 		<h2>Lost Drone Protocol</h2>
 		<a href="/play"><h3>Play</h3></a>
 		<a href="https://github.com/CoasterFan5/duke-jam-4" target="_blank"><h3>Source Code</h3></a>
+		<p>Warning: Mobile is not supported at this time.</p>
 	</div>
 </button>
 
