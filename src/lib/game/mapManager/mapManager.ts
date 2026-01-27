@@ -79,29 +79,34 @@ export class GameMapManager {
 		if (this.map[x] && this.map[x][y]) {
 			return this.map[x][y];
 		} else {
-			let terrain: TerrainType | undefined = undefined;
-			let highest = 0;
-			for (const ttype in this.noisePatterns) {
-				const terrainType = ttype as TerrainType;
-				const value = this.noisePatterns[terrainType](x, y);
-				if (value > 0.95 && value > highest) {
-					highest = value;
-					terrain = terrainType;
-				}
+			return this.generateTile(x, y);
+		}
+	}
 
-				if (!this.map[x]) {
-					this.map[x] = {};
-				}
+	generateTile(x: number, y: number) {
+		if (!this.map[x]) {
+			this.map[x] = {};
+		}
 
-				this.map[x][y] = new TileManager({
-					facing: 'n',
-					x,
-					y,
-					terrain: terrain
-				});
-				return this.map[x][y];
+		let terrain: TerrainType | undefined = undefined;
+		let highest = 0;
+
+		for (const ttype in this.noisePatterns) {
+			const terrainType = ttype as TerrainType;
+			const value = this.noisePatterns[terrainType](x / 10, y / 10);
+			if (value > 0.8 && value > highest) {
+				highest = value;
+				terrain = terrainType;
 			}
 		}
+
+		this.map[x][y] = new TileManager({
+			facing: 'n',
+			x,
+			y,
+			terrain: terrain
+		});
+		return this.map[x][y];
 	}
 
 	getSize() {
@@ -198,14 +203,16 @@ export class GameMapManager {
 	}
 
 	getCursorPosition() {
+		const offsets = this.getOffsets();
+
 		return {
 			raw: {
 				x: this.cursorData.x,
 				y: this.cursorData.y
 			},
 			tile: {
-				x: Math.floor((this.cursorData.x + (this.playerData.x % getTileSize())) / getTileSize()),
-				y: Math.floor((this.cursorData.y + (this.playerData.y % getTileSize())) / getTileSize())
+				x: Math.floor((this.cursorData.x + offsets.xOffsetPx) / 48),
+				y: Math.floor((this.cursorData.y + offsets.yOffsetPx) / 48)
 			}
 		};
 	}

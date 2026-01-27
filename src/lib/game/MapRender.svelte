@@ -112,8 +112,8 @@
 
 				ctx.drawImage(
 					cursorHtmlImage,
-					cPos.tile.x * getTileSize() - offsets.xOffsetPx,
-					cPos.tile.y * getTileSize() - offsets.yOffsetPx,
+					Math.floor(cPos.tile.x * getTileSize() - offsets.xOffsetPx),
+					Math.floor(cPos.tile.y * getTileSize() - offsets.yOffsetPx),
 					getTileSize(),
 					getTileSize()
 				);
