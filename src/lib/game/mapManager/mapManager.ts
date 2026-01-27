@@ -5,6 +5,7 @@ import { UiManager } from '../uiManager/uiManager';
 import { TileManager, type FacingDirection, type TerrainType } from './tileManager';
 import { getTileSize } from './tileSize';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
+import { normalizeToTile } from '$lib/utils/normalize';
 
 export const itemList = [
 	'ironOre',
@@ -34,6 +35,10 @@ export type GameMapType = Record<number, Record<number, TileManager>>;
 
 export class GameMapManager {
 	size = 100;
+	private noisePatterns: Record<TerrainType, NoiseFunction2D> = {
+		iron_ore: createNoise2D(),
+		copper_ore: createNoise2D()
+	};
 	public uiManager: UiManager = new UiManager();
 	private map: GameMapType;
 	private canvasDimensions: {
@@ -70,43 +75,32 @@ export class GameMapManager {
 		};
 	}
 
-	generate(size: number) {
-		this.size = size;
-
-		const noisePatterns: Record<TerrainType, NoiseFunction2D> = {
-			iron_ore: createNoise2D(),
-			copper_ore: createNoise2D()
-		};
-
-		for (let x = 0; x < size; x++) {
-			this.map[x] = {};
-			for (let y = 0; y < size; y++) {
-				let terrain: TerrainType | undefined = undefined;
-				let highest = 0;
-				for (const ttype in noisePatterns) {
-					const terrainType = ttype as TerrainType;
-					const value = noisePatterns[terrainType](x, y);
-					if (value > 0.95 && value > highest) {
-						highest = value;
-						terrain = terrainType;
-					}
-
-					this.map[x][y] = new TileManager({
-						facing: 'n',
-						x,
-						y,
-						terrain: terrain
-					});
-				}
-			}
-		}
-	}
-
 	getTile(x: number, y: number) {
 		if (this.map[x] && this.map[x][y]) {
 			return this.map[x][y];
 		} else {
-			return undefined;
+			let terrain: TerrainType | undefined = undefined;
+			let highest = 0;
+			for (const ttype in this.noisePatterns) {
+				const terrainType = ttype as TerrainType;
+				const value = this.noisePatterns[terrainType](x, y);
+				if (value > 0.95 && value > highest) {
+					highest = value;
+					terrain = terrainType;
+				}
+
+				if (!this.map[x]) {
+					this.map[x] = {};
+				}
+
+				this.map[x][y] = new TileManager({
+					facing: 'n',
+					x,
+					y,
+					terrain: terrain
+				});
+				return this.map[x][y];
+			}
 		}
 	}
 
@@ -165,9 +159,6 @@ export class GameMapManager {
 	addPlayerPosition(x: number, y: number) {
 		this.playerData.x += x;
 		this.playerData.y += y;
-
-		this.playerData.x = Math.max(0, Math.min((this.size - 1) * getTileSize(), this.playerData.x));
-		this.playerData.y = Math.max(0, Math.min((this.size - 1) * getTileSize(), this.playerData.y));
 	}
 
 	setCursorPosition(x: number, y: number) {
@@ -193,10 +184,10 @@ export class GameMapManager {
 	getOffsets() {
 		const playerPos = this.getPlayerPosition();
 		const xOffsetTiles = playerPos.tile.x;
-		const xOffsetPx = playerPos.raw.x % getTileSize();
+		const xOffsetPx = normalizeToTile(playerPos.raw.x % getTileSize());
 
 		const yOffsetTiles = playerPos.tile.y;
-		const yOffsetPx = playerPos.raw.y % getTileSize();
+		const yOffsetPx = normalizeToTile(playerPos.raw.y % getTileSize());
 
 		return {
 			xOffsetTiles,

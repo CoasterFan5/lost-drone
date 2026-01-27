@@ -41,8 +41,8 @@ export const renderTiles = ({
 		for (let y = -1; y < yTiles + 1; y++) {
 			const t = mapManager.getTile(x + xOffsetTiles - xTilesHalf, y + yOffsetTiles - yTilesHalf);
 
-			const trueRenderX = Math.round(x * getTileSize() - xOffsetPx);
-			const trueRenderY = Math.round(y * getTileSize() - yOffsetPx);
+			const trueRenderX = Math.floor(x * getTileSize() - xOffsetPx);
+			const trueRenderY = Math.floor(y * getTileSize() - yOffsetPx);
 
 			if (t) {
 				ctx.fillStyle = '#43264C';
