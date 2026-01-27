@@ -5,6 +5,8 @@
 	let { children } = $props();
 </script>
 
+<title>Lost Drone Protocol</title>
+
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
