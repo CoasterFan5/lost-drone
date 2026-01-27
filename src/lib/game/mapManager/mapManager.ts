@@ -7,6 +7,7 @@ import { getTileSize } from './tileSize';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 import { normalizeToTile } from '$lib/utils/normalize';
 import type { GameData } from './gameData';
+import Alea from 'alea';
 
 export const itemList = [
 	'ironOre',
@@ -36,10 +37,7 @@ export type GameMapType = Record<number, Record<number, TileManager>>;
 
 export class GameMapManager {
 	size = 100;
-	private noisePatterns: Record<TerrainType, NoiseFunction2D> = {
-		iron_ore: createNoise2D(),
-		copper_ore: createNoise2D()
-	};
+	private noisePatterns: Record<TerrainType, NoiseFunction2D>;
 	private gameData: GameData;
 	public uiManager: UiManager = new UiManager();
 	private canvasDimensions: {
@@ -58,7 +56,7 @@ export class GameMapManager {
 		this.gameData = {
 			meta: {
 				name: 'New Game',
-				seed: Date.now(),
+				seed: 0,
 				id: '0',
 				version: 1
 			},
@@ -71,6 +69,11 @@ export class GameMapManager {
 				},
 				tickables: {}
 			}
+		};
+
+		this.noisePatterns = {
+			iron_ore: createNoise2D(Alea(this.gameData.meta.seed)),
+			copper_ore: createNoise2D(Alea(this.gameData.meta.seed + 1))
 		};
 	}
 
