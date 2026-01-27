@@ -6,6 +6,7 @@ import { TileManager, type FacingDirection, type TerrainType } from './tileManag
 import { getTileSize } from './tileSize';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 import { normalizeToTile } from '$lib/utils/normalize';
+import type { GameData } from './gameData';
 
 export const itemList = [
 	'ironOre',
@@ -39,17 +40,13 @@ export class GameMapManager {
 		iron_ore: createNoise2D(),
 		copper_ore: createNoise2D()
 	};
+	private gameData: GameData;
 	public uiManager: UiManager = new UiManager();
-	private map: GameMapType;
 	private canvasDimensions: {
 		width: number;
 		height: number;
 	} = { width: 0, height: 0 };
-	private playerData: {
-		x: number;
-		y: number;
-		facing: number;
-	};
+
 	private cursorData: {
 		x: number;
 		y: number;
@@ -57,35 +54,37 @@ export class GameMapManager {
 		selectedDirection: FacingDirection;
 	} = { x: 0, y: 0, selectedDirection: 'n' };
 
-	private tickables: Record<
-		string,
-		{
-			x: number;
-			y: number;
-			tileManager: TileManager;
-		}
-	> = {};
-
 	constructor() {
-		this.map = {};
-		this.playerData = {
-			x: 0,
-			y: 0,
-			facing: 0
+		this.gameData = {
+			meta: {
+				name: 'New Game',
+				seed: Date.now(),
+				id: '0',
+				version: 1
+			},
+			data: {
+				map: {},
+				playerData: {
+					x: 0,
+					y: 0,
+					facing: 0
+				},
+				tickables: {}
+			}
 		};
 	}
 
 	getTile(x: number, y: number) {
-		if (this.map[x] && this.map[x][y]) {
-			return this.map[x][y];
+		if (this.gameData.data.map[x] && this.gameData.data.map[x][y]) {
+			return this.gameData.data.map[x][y];
 		} else {
 			return this.generateTile(x, y);
 		}
 	}
 
 	generateTile(x: number, y: number) {
-		if (!this.map[x]) {
-			this.map[x] = {};
+		if (!this.gameData.data.map[x]) {
+			this.gameData.data.map[x] = {};
 		}
 
 		let terrain: TerrainType | undefined = undefined;
@@ -100,13 +99,13 @@ export class GameMapManager {
 			}
 		}
 
-		this.map[x][y] = new TileManager({
+		this.gameData.data.map[x][y] = new TileManager({
 			facing: 'n',
 			x,
 			y,
 			terrain: terrain
 		});
-		return this.map[x][y];
+		return this.gameData.data.map[x][y];
 	}
 
 	getSize() {
@@ -119,8 +118,8 @@ export class GameMapManager {
 	}
 
 	tick(delta: number, tickId: number, objectiveManager: ObjectiveManager) {
-		for (const item in this.tickables) {
-			const tile = this.tickables[item];
+		for (const item in this.gameData.data.tickables) {
+			const tile = this.gameData.data.tickables[item];
 			tile.tileManager.tick({
 				mapManager: this,
 				objectiveManager,
@@ -133,10 +132,10 @@ export class GameMapManager {
 	}
 
 	place(item: TileManager, x: number, y: number) {
-		this.map[x][y] = item;
+		this.gameData.data.map[x][y] = item;
 
 		if (item.data.building) {
-			this.tickables[`${x}-${y}`] = {
+			this.gameData.data.tickables[`${x}-${y}`] = {
 				x,
 				y,
 				tileManager: item
@@ -145,25 +144,25 @@ export class GameMapManager {
 	}
 
 	getPlayerData() {
-		return this.playerData;
+		return this.gameData.data.playerData;
 	}
 
 	getPlayerPosition() {
 		return {
 			raw: {
-				x: this.playerData.x,
-				y: this.playerData.y
+				x: this.gameData.data.playerData.x,
+				y: this.gameData.data.playerData.y
 			},
 			tile: {
-				x: Math.floor(this.playerData.x / getTileSize()),
-				y: Math.floor(this.playerData.y / getTileSize())
+				x: Math.floor(this.gameData.data.playerData.x / getTileSize()),
+				y: Math.floor(this.gameData.data.playerData.y / getTileSize())
 			}
 		};
 	}
 
 	addPlayerPosition(x: number, y: number) {
-		this.playerData.x += x;
-		this.playerData.y += y;
+		this.gameData.data.playerData.x += x;
+		this.gameData.data.playerData.y += y;
 	}
 
 	setCursorPosition(x: number, y: number) {
