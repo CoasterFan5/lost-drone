@@ -1,13 +1,13 @@
 import { createNoise2D, type NoiseFunction2D } from 'simplex-noise';
-import { type GameBuildingName } from '../gameBuildings/gameBuildings';
-import type { GameBuilding } from '../gameBuildings/utils/BehaviorBase';
 import { UiManager } from '../uiManager/uiManager';
-import { TileManager, type FacingDirection, type TerrainType } from './tileManager';
+import { tileManager, type FacingDirection, type TerrainType, type TileData } from './tileManager';
 import { getTileSize } from './tileSize';
-import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
+import { ObjectiveManager } from '../objectiveManager/objectiveManager';
 import { normalizeToTile } from '$lib/utils/normalize';
 import type { GameData } from './gameData';
 import Alea from 'alea';
+import type { GameBuilding } from '../gameBuildings/gameBuildings';
+import { gameBuildingBehaviorMap } from '../gameBuildings/gameBuildingBehaviorBase';
 
 export const itemList = [
 	'ironOre',
@@ -26,17 +26,16 @@ export type GameItem = (typeof itemList)[number];
 
 export type Tile = {
 	data: {
-		building?: GameBuildingName;
+		building?: GameBuilding;
 		facing?: 'n' | 'e' | 's' | 'w';
 		cooldown?: number;
 		holding?: GameItem;
 	};
 };
 
-export type GameMapType = Record<number, Record<number, TileManager>>;
+export type GameMapType = Record<number, Record<number, TileData>>;
 
 export class GameMapManager {
-	size = 100;
 	private noisePatterns: Record<TerrainType, NoiseFunction2D>;
 	private gameData: GameData;
 	public uiManager: UiManager = new UiManager();
@@ -102,17 +101,13 @@ export class GameMapManager {
 			}
 		}
 
-		this.gameData.data.map[x][y] = new TileManager({
+		this.gameData.data.map[x][y] = {
 			facing: 'n',
 			x,
 			y,
 			terrain: terrain
-		});
+		};
 		return this.gameData.data.map[x][y];
-	}
-
-	getSize() {
-		return this.size;
 	}
 
 	setCanvasDimensions(width: number, height: number) {
@@ -123,25 +118,23 @@ export class GameMapManager {
 	tick(delta: number, tickId: number, objectiveManager: ObjectiveManager) {
 		for (const item in this.gameData.data.tickables) {
 			const tile = this.gameData.data.tickables[item];
-			tile.tileManager.tick({
+			tileManager.tick(tile.tileData, {
 				mapManager: this,
 				objectiveManager,
-				x: tile.x,
-				y: tile.y,
 				delta,
 				tickId
 			});
 		}
 	}
 
-	place(item: TileManager, x: number, y: number) {
-		this.gameData.data.map[x][y] = item;
+	place(tileData: TileData, x: number, y: number) {
+		this.gameData.data.map[x][y] = tileData;
 
-		if (item.data.building) {
+		if (tileData.building) {
 			this.gameData.data.tickables[`${x}-${y}`] = {
 				x,
 				y,
-				tileManager: item
+				tileData: tileData
 			};
 		}
 	}
@@ -271,41 +264,41 @@ export class GameMapManager {
 
 		if (currentTile) {
 			if (e.button == 0) {
-				const inRange = currentTile.inPlayerPlaceRange({ map: this });
+				const inRange = tileManager.inPlayerPlaceRange(currentTile, {
+					map: this
+				});
 				if (this.cursorData.selectedBuilding) {
-					const validPlacement = this.cursorData.selectedBuilding.isValidPlacement({
-						tile: currentTile,
-						gameManager: this
-					});
+					const validPlacement =
+						gameBuildingBehaviorMap[this.cursorData.selectedBuilding].isValidPlacement(currentTile);
 
 					if (validPlacement && inRange) {
 						this.place(
-							new TileManager({
-								building: this.cursorData.selectedBuilding.new(),
+							{
+								building: this.cursorData.selectedBuilding,
+								buildingData:
+									gameBuildingBehaviorMap[this.cursorData.selectedBuilding].initBuildingData(),
 								facing: this.cursorData.selectedDirection,
-								x: currentTile.data.x,
-								y: currentTile.data.y,
-								terrain: currentTile.data.terrain
-							}),
-							currentTile.data.x,
-							currentTile.data.y
+								x: currentTile.x,
+								y: currentTile.y,
+								terrain: currentTile.terrain
+							},
+							currentTile.x,
+							currentTile.y
 						);
 					}
 				} else {
-					currentTile.onClick({
-						mapManager: this
-					});
+					tileManager.onClick(currentTile, this);
 				}
 			} else if (e.button == 2) {
 				this.place(
-					new TileManager({
-						terrain: currentTile.data.terrain,
+					{
+						terrain: currentTile.terrain,
 						facing: 'n',
-						x: currentTile.data.x,
-						y: currentTile.data.y
-					}),
-					currentTile.data.x,
-					currentTile.data.y
+						x: currentTile.x,
+						y: currentTile.y
+					},
+					currentTile.x,
+					currentTile.y
 				);
 			}
 		}

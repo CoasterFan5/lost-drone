@@ -1,5 +1,5 @@
 import type { GameMapType } from './mapManager';
-import type { TileManager } from './tileManager';
+import type { TileData } from './tileManager';
 
 export type GameData = {
 	meta: {
@@ -20,7 +20,7 @@ export type GameData = {
 			{
 				x: number;
 				y: number;
-				tileManager: TileManager;
+				tileData: TileData;
 			}
 		>;
 	};

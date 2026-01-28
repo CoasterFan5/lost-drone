@@ -1,19 +1,20 @@
 <script lang="ts">
 	import { itemImageMap } from '$lib/game/colorMaps';
+	import { type GameItem } from '$lib/game/mapManager/mapManager';
+	import type { TileData } from '$lib/game/mapManager/tileManager';
 	import UiBase from '$lib/game/uiManager/UiBase.svelte';
 	import type { UiManager } from '$lib/game/uiManager/uiManager';
-	import type { Crafter } from './crafter';
-	import { craftingRecipeNames, craftingRecipes, type RecipeName } from './recipes';
+	import { craftingRecipeNames, craftingRecipes, type RecipeName } from '../utils/recipes';
 
 	const {
-		crafter,
+		crafterData,
 		uiManager
 	}: {
 		uiManager: UiManager;
-		crafter: Crafter;
+		crafterData: TileData;
 	} = $props();
 
-	let selectedRecipe: RecipeName | undefined = $state(crafter.getRecipe());
+	let selectedRecipe: RecipeName | undefined = $state(crafterData.buildingData?.selectedRecipe);
 </script>
 
 <UiBase>
@@ -37,9 +38,9 @@
 				<div class="top">
 					<p>{recipeDetails.prettyName}</p>
 					<div class="recipeRequirements">
-						{#each recipeDetails.requirements as req, i (i)}
+						{#each Object.entries(recipeDetails.requirements) as [item], i (i)}
 							<div class="inputs itemBox">
-								<img src={itemImageMap[req].src} alt={req} />
+								<img src={itemImageMap[item as GameItem].src} alt={item} />
 							</div>
 						{/each}
 						<div class="arrow itemBox">
@@ -59,7 +60,12 @@
 
 				<button
 					onclick={() => {
-						crafter.setRecipe(selectedRecipe!);
+						if (!crafterData.buildingData) {
+							crafterData.buildingData = {
+								cooldownTimer: 0
+							};
+						}
+						crafterData.buildingData.selectedRecipe = selectedRecipe;
 						uiManager.clearUi();
 					}}
 				>

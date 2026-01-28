@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { GameMapManager } from './mapManager/mapManager';
+	import type { GameItem, GameMapManager } from './mapManager/mapManager';
 	import playerImage from '$lib/assets/Player.png';
 	import cursorImage from '$lib/assets/cursor.png';
 	import cursorOutOfRangeImageData from '$lib/assets/cursor_out_of_range.png';
@@ -11,12 +11,13 @@
 	import { getTileSize } from './mapManager/tileSize';
 	import { renderTiles } from './renderHelpers/renderTiles';
 	import { imageManipulationValues } from './renderHelpers/imageManipulationValues';
-	import type { TileManager } from './mapManager/tileManager';
 	import { itemImageMap } from './colorMaps';
 	import { ObjectiveManager, type ObjectiveTarget } from './objectiveManager/objectiveManager';
+	import { tileManager, type TileData } from './mapManager/tileManager';
+	import { gameBuildingBehaviorMap } from './gameBuildings/gameBuildingBehaviorBase';
 
 	let uiKey = $state(0);
-	let hoveringTile: TileManager | undefined = $state(undefined);
+	let hoveringTile: TileData | undefined = $state(undefined);
 	let objectiveName: string = $state('');
 	let target: ObjectiveTarget | undefined = $state();
 	let progress: number = $state(0);
@@ -63,8 +64,8 @@
 
 				//render ghost
 				const cPos = mapManager.getCursorPosition();
-				const b = mapManager.getSelectedBuilding();
-				if (b) {
+				const building = mapManager.getSelectedBuilding();
+				if (building) {
 					const imageManipulation = imageManipulationValues[mapManager.getRotationDirection()];
 					ctx.save();
 					ctx.translate(
@@ -73,7 +74,7 @@
 					);
 					ctx.rotate(imageManipulation.r);
 					ctx.globalAlpha = 0.5;
-					const buildingImage = b.getRenderer();
+					const buildingImage = gameBuildingBehaviorMap[building].getRenderer();
 					ctx.drawImage(
 						buildingImage,
 						imageManipulation.xOffset,
@@ -89,20 +90,24 @@
 				const selectedTile = mapManager.getSelectedTile();
 				hoveringTile = selectedTile;
 				const cursorHtmlImage = new Image();
-				if (mapManager.getSelectedBuilding() && selectedTile) {
+				const selectedBuilding = mapManager.getSelectedBuilding();
+				if (selectedBuilding && selectedTile) {
 					if (
-						selectedTile.inPlayerPlaceRange({ map: mapManager }) &&
-						mapManager.getSelectedBuilding()?.isValidPlacement({
-							tile: selectedTile,
-							gameManager: mapManager
-						})
+						tileManager.inPlayerPlaceRange(selectedTile, {
+							map: mapManager
+						}) &&
+						gameBuildingBehaviorMap[selectedBuilding].isValidPlacement(selectedTile)
 					) {
 						cursorHtmlImage.src = cursorGoodImageData;
 					} else {
 						cursorHtmlImage.src = cursorOutOfRangeImageData;
 					}
 				} else {
-					if (selectedTile && selectedTile.data.building?.getUi) {
+					if (
+						selectedTile &&
+						selectedTile.building &&
+						gameBuildingBehaviorMap[selectedTile.building].onClick
+					) {
 						hoveringTile = selectedTile;
 						cursorHtmlImage.src = cursorInteractImageData;
 					} else {
@@ -180,23 +185,25 @@
 			<div class="progress" style="--p: {progress * 100}%"></div>
 		{/if}
 	</div>
-	{#if hoveringTile?.data.terrain != undefined}
+	{#if hoveringTile?.terrain != undefined}
 		<div class="section">
-			<p>Terrain: {hoveringTile?.data.terrain}</p>
+			<p>Terrain: {hoveringTile?.terrain}</p>
 		</div>
 	{/if}
-	{#if hoveringTile?.data.building}
-		{@const inv = hoveringTile.data.building.getInventory(hoveringTile)}
+	{#if hoveringTile?.building}
 		<div class="section">
-			<p>Hovering: <span class="objective">{hoveringTile.data.building.name}</span></p>
-			{#if inv && inv.length > 0}
-				<p>Holding:</p>
-				{#each inv as i, index (index)}
-					<div class="inventoryItem">
-						<img src={itemImageMap[i[0]].src} alt={i[0]} />
-						<span class="label">{i[1]}</span>
-					</div>
-				{/each}
+			<p>Hovering: <span class="objective">{hoveringTile.building}</span></p>
+			{#if hoveringTile.buildingData?.inventory}
+				{@const i = Object.entries(hoveringTile.buildingData.inventory)}
+				{#if i.length > 0}
+					<p>Holding:</p>
+					{#each i as [item, quanitity], index (index)}
+						<div class="inventoryItem">
+							<img src={itemImageMap[item as GameItem].src} alt={item} />
+							<span class="label">{item}({quanitity})</span>
+						</div>
+					{/each}
+				{/if}
 			{/if}
 		</div>
 	{/if}
@@ -247,15 +254,16 @@
 
 		.inventoryItem {
 			display: flex;
+			flex-direction: row;
 			align-items: center;
-			justify-content: center;
+			justify-content: start;
 			position: relative;
 			aspect-ratio: 1/1;
 			height: 2rem;
-			width: 2rem;
+			width: 100%;
 
 			.label {
-				position: absolute;
+				position: relative;
 				right: 0px;
 				bottom: 0px;
 				background: rgba(0, 0, 0, 0.25);

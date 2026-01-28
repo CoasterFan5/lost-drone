@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { gameBuildingBehavior, gameBuildings } from '../gameBuildings/gameBuildings';
-	import type { GameBuilding } from '../gameBuildings/utils/BehaviorBase';
+	import { gameBuildingBehaviorMap } from '../gameBuildings/gameBuildingBehaviorBase';
+	import { gameBuildings, type GameBuilding } from '../gameBuildings/gameBuildings';
 	import type { GameMapManager } from '../mapManager/mapManager';
 
 	const {
@@ -14,9 +14,9 @@
 
 <div class="wrap">
 	{#if hovered}
-		<p>{hovered.name}</p>
+		<p>{gameBuildingBehaviorMap[hovered].name}</p>
 
-		{hovered.description}
+		{gameBuildingBehaviorMap[hovered].description}
 	{/if}
 	<div
 		class="buildings"
@@ -25,9 +25,8 @@
 		}}
 		role={null}
 	>
-		{#each gameBuildings as b (b)}
-			{@const building = new gameBuildingBehavior[b]()}
-			{@const buildingImage = building.getRenderer()}
+		{#each gameBuildings as building (building)}
+			{@const buildingImage = gameBuildingBehaviorMap[building].getRenderer()}
 			<button
 				class="item"
 				onclick={(e) => {
@@ -39,7 +38,7 @@
 					hovered = building;
 				}}
 			>
-				<img src={buildingImage.src} alt={b} />
+				<img src={buildingImage.src} alt={building} />
 			</button>
 		{/each}
 	</div>
