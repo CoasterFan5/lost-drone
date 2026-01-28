@@ -3,7 +3,7 @@ import type { GameItem, GameMapManager } from '../mapManager/mapManager';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 import type { BuildingData } from './buildingData';
 import { communicationsRelayBehavior } from './communicationsRelay/communicationsRelay';
-import { conveyorBehavior } from './conveyer/conveyer';
+import { conveyorBehavior } from './conveyor/conveyor';
 import { crafterBehavior } from './crafter/crafter';
 import { furnaceBehavior } from './furnace/furnace';
 import type { GameBuilding } from './gameBuildings';
