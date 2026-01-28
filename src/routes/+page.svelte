@@ -1,14 +1,25 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { saveManager } from '$lib/game/saveManager/saveManager';
 
-	const newGame = () => {
+	const continueGame = () => {
 		goto('/play');
 	};
+
+	const newGame = () => {
+		saveManager.setActiveGame(Date.now().toString(16));
+		goto('/play');
+	};
+
+	const hasSaveGame = saveManager.hasSaveGame();
 </script>
 
 <div class="wrap">
 	<div class="menu">
 		<h2>Lost Drone Protocol</h2>
+		{#if hasSaveGame}
+			<button class="button" onclick={continueGame}><h3>Continue</h3> </button>
+		{/if}
 		<button class="button" onclick={newGame}><h3>New Game</h3> </button>
 		<a class="button" href="https://github.com/CoasterFan5/lost-drone" target="_blank"
 			><h3>Source Code</h3></a

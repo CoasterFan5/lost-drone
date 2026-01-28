@@ -8,6 +8,7 @@ import type { GameData } from './gameData';
 import Alea from 'alea';
 import type { GameBuilding } from '../gameBuildings/gameBuildings';
 import { gameBuildingBehaviorMap } from '../gameBuildings/gameBuildingBehaviorBase';
+import { saveManager } from '../saveManager/saveManager';
 
 export const itemList = [
 	'ironOre',
@@ -52,28 +53,18 @@ export class GameMapManager {
 	} = { x: 0, y: 0, selectedDirection: 'n' };
 
 	constructor() {
-		this.gameData = {
-			meta: {
-				name: 'New Game',
-				seed: 0,
-				id: '0',
-				version: 1
-			},
-			data: {
-				map: {},
-				playerData: {
-					x: 0,
-					y: 0,
-					facing: 0
-				},
-				tickables: {}
-			}
-		};
+		this.gameData = saveManager.tryLoad();
 
 		this.noisePatterns = {
 			iron_ore: createNoise2D(Alea(this.gameData.meta.seed)),
 			copper_ore: createNoise2D(Alea(this.gameData.meta.seed + 1))
 		};
+
+		console.log(this.gameData.data.tickables);
+
+		setInterval(() => {
+			saveManager.saveGame(this.gameData);
+		}, 5_000);
 	}
 
 	getTile(x: number, y: number) {
@@ -117,8 +108,9 @@ export class GameMapManager {
 
 	tick(delta: number, tickId: number, objectiveManager: ObjectiveManager) {
 		for (const item in this.gameData.data.tickables) {
-			const tile = this.gameData.data.tickables[item];
-			tileManager.tick(tile.tileData, {
+			const tickable = this.gameData.data.tickables[item];
+			const tileData = this.gameData.data.map[tickable.x][tickable.y];
+			tileManager.tick(tileData, {
 				mapManager: this,
 				objectiveManager,
 				delta,
