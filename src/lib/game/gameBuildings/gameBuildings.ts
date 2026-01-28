@@ -1,5 +1,5 @@
 export const gameBuildings = [
-	'Conveyer',
+	'Conveyor',
 	'Miner',
 	'Furnace',
 	'Crafter',

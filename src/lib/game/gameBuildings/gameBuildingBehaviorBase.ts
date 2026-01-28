@@ -3,7 +3,7 @@ import type { GameItem, GameMapManager } from '../mapManager/mapManager';
 import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
 import type { BuildingData } from './buildingData';
 import { communicationsRelayBehavior } from './communicationsRelay/communicationsRelay';
-import { conveyerBehavior } from './conveyer/conveyer';
+import { conveyorBehavior } from './conveyer/conveyer';
 import { crafterBehavior } from './crafter/crafter';
 import { furnaceBehavior } from './furnace/furnace';
 import type { GameBuilding } from './gameBuildings';
@@ -31,7 +31,7 @@ export type GameBuildingBehavior = {
 
 export const gameBuildingBehaviorMap: Record<GameBuilding, GameBuildingBehavior> = {
 	Miner: minerBehavior,
-	Conveyer: conveyerBehavior,
+	Conveyor: conveyorBehavior,
 	Furnace: furnaceBehavior,
 	Crafter: crafterBehavior,
 	MappingRelay: mappingRelayBehavior,

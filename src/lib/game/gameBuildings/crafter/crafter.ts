@@ -24,20 +24,20 @@ const getInventory = (tileData: TileData) => {
 
 export const crafterBehavior: GameBuildingBehavior = {
 	name: 'Crafter',
-	description: 'Crafts items. Click to select a recipie.',
+	description: 'Crafts items. Click to select a recipe.',
 	tick(tileData, delta, mapManager, objectiveManager) {
 		if (!tileData.buildingData?.selectedRecipe) {
 			return;
 		}
-		const recipie = tileData.buildingData.selectedRecipe;
+		const recipe = tileData.buildingData.selectedRecipe;
 		const inventory = getInventory(tileData);
-		for (const key in craftingRecipes[recipie].requirements) {
+		for (const key in craftingRecipes[recipe].requirements) {
 			const item = key as GameItem;
-			if ((inventory[item] ?? 0) < craftingRecipes[recipie].requirements[item]!) {
+			if ((inventory[item] ?? 0) < craftingRecipes[recipe].requirements[item]!) {
 				return;
 			}
 		}
-		const product = craftingRecipes[recipie].product;
+		const product = craftingRecipes[recipe].product;
 		const nextTile = getNextTileFromThisTile(tileData, mapManager);
 		if (
 			!tileManager.canHoldItem(nextTile, {
@@ -48,9 +48,9 @@ export const crafterBehavior: GameBuildingBehavior = {
 		}
 
 		// were crafting it
-		for (const key in craftingRecipes[recipie].requirements) {
+		for (const key in craftingRecipes[recipe].requirements) {
 			const item = key as GameItem;
-			inventory[item]! -= craftingRecipes[recipie].requirements[item]!;
+			inventory[item]! -= craftingRecipes[recipe].requirements[item]!;
 		}
 		tileManager.setHolding(nextTile, {
 			item: product
@@ -92,8 +92,8 @@ export const crafterBehavior: GameBuildingBehavior = {
 			return false;
 		}
 
-		const recipie = craftingRecipes[tileData.buildingData.selectedRecipe];
-		const max = (recipie.requirements[item] ?? 0) * 2;
+		const recipe = craftingRecipes[tileData.buildingData.selectedRecipe];
+		const max = (recipe.requirements[item] ?? 0) * 2;
 		if ((getInventory(tileData)[item] ?? 0) >= max || max == 0) {
 			console.log(getInventory(tileData));
 			return false;

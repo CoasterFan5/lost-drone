@@ -1,6 +1,6 @@
 import { tileManager } from '$lib/game/mapManager/tileManager';
 import type { GameBuildingBehavior } from '../gameBuildingBehaviorBase';
-import { furnaceRecipies } from '../utils/furnaceRecipies';
+import { furnaceRecipes } from '../utils/furnaceRecipies';
 import { getNextTileFromThisTile } from '../utils/getDirectionTile';
 import imageData from '$lib/assets/Smelter.png';
 
@@ -22,7 +22,7 @@ export const furnaceBehavior: GameBuildingBehavior = {
 		tileData.buildingData.cooldownTimer -= delta;
 		if (tileData.buildingData.cooldownTimer <= 0) {
 			const nextTile = getNextTileFromThisTile(tileData, mapManager);
-			const product = furnaceRecipies[tileData.holding];
+			const product = furnaceRecipes[tileData.holding];
 
 			if (
 				product &&
@@ -52,7 +52,7 @@ export const furnaceBehavior: GameBuildingBehavior = {
 		return htmlImage;
 	},
 	canHoldItem(tileData, item) {
-		return !tileData.holding && !!furnaceRecipies[item];
+		return !tileData.holding && !!furnaceRecipes[item];
 	},
 	isValidPlacement() {
 		return true;

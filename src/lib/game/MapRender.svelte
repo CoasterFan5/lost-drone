@@ -197,10 +197,10 @@
 				{@const i = Object.entries(hoveringTile.buildingData.inventory)}
 				{#if i.length > 0}
 					<p>Holding:</p>
-					{#each i as [item, quanitity], index (index)}
+					{#each i as [item, quantity], index (index)}
 						<div class="inventoryItem">
 							<img src={itemImageMap[item as GameItem].src} alt={item} />
-							<span class="label">{item}({quanitity})</span>
+							<span class="label">{item}({quantity})</span>
 						</div>
 					{/each}
 				{/if}
