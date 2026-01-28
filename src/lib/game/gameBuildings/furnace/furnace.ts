@@ -1,6 +1,6 @@
 import { tileManager } from '$lib/game/mapManager/tileManager';
 import type { GameBuildingBehavior } from '../gameBuildingBehaviorBase';
-import { furnaceRecipes } from '../utils/furnaceRecipies';
+import { furnaceRecipes } from '../utils/furnaceRecipes';
 import { getNextTileFromThisTile } from '../utils/getDirectionTile';
 import imageData from '$lib/assets/Smelter.png';
 
