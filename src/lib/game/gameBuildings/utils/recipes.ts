@@ -14,38 +14,54 @@ export const craftingRecipes: Record<
 	RecipeName,
 	{
 		prettyName: string;
-		requirements: GameItem[];
+		requirements: Partial<Record<GameItem, number>>;
 		product: GameItem;
 	}
 > = {
 	ironGear: {
 		prettyName: 'Iron Gear',
-		requirements: ['ironPlate', 'ironPlate'],
+		requirements: {
+			ironPlate: 2
+		},
 		product: 'ironGear'
 	},
 	ironRod: {
 		prettyName: 'Iron Rod',
-		requirements: ['ironPlate'],
+		requirements: {
+			ironPlate: 1
+		},
 		product: 'ironRod'
 	},
 	circuitBoard: {
 		prettyName: 'Circuit Board',
-		requirements: ['ironPlate', 'copperPlate'],
+		requirements: {
+			ironPlate: 1,
+			copperPlate: 1
+		},
 		product: 'circuitBoard'
 	},
 	dataDrive: {
 		prettyName: 'Data Drive',
-		requirements: ['circuitBoard', 'ironGear'],
+		requirements: {
+			circuitBoard: 1,
+			ironGear: 1
+		},
 		product: 'dataDrive'
 	},
 	communicationsModule: {
 		prettyName: 'Communications Module',
-		requirements: ['dataDrive', 'ironRod'],
+		requirements: {
+			dataDrive: 1,
+			ironRod: 1
+		},
 		product: 'communicationsModule'
 	},
 	mappingModule: {
 		prettyName: 'Mapping Module',
-		requirements: ['communicationsModule', 'mappingData'],
+		requirements: {
+			communicationsModule: 1,
+			mappingData: 1
+		},
 		product: 'mappingModule'
 	}
 } as const;

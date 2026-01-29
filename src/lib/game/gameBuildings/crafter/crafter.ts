@@ -1,162 +1,119 @@
-import type { GameItem } from '../../mapManager/mapManager';
+import { tileManager, type TileData } from '$lib/game/mapManager/tileManager';
+import type { GameBuildingBehavior } from '../gameBuildingBehaviorBase';
 import imageData from '$lib/assets/Crafter.png';
-import {
-	GameBuilding,
-	type CanAcceptItemParams,
-	type GetUiParams,
-	type OnClickParams,
-	type PlaceActionParams,
-	type TickMethodParams
-} from '../utils/BehaviorBase';
-import { getNextTile } from '../utils/getDirectionTile';
+import { craftingRecipes } from '../utils/recipes';
+import type { GameItem } from '$lib/game/mapManager/mapManager';
+import { getNextTileFromThisTile } from '../utils/getDirectionTile';
 import CrafterUi from './CrafterUi.svelte';
-import { craftingRecipes, type RecipeName } from './recipes';
-
 let image: HTMLImageElement | undefined = undefined;
 
-export class Crafter extends GameBuilding {
-	name = 'Crafter';
-	description = 'Crafts items. Click to select recipe.';
-	private storage: Partial<Record<GameItem, { count: number; max: number }>> = {
-		ironPlate: {
-			max: 4,
-			count: 0
+const getInventory = (tileData: TileData) => {
+	if (!tileData.buildingData) {
+		tileData.buildingData = {
+			cooldownTimer: 0,
+			inventory: {}
+		};
+	}
+
+	if (!tileData.buildingData.inventory) {
+		tileData.buildingData.inventory = {};
+	}
+
+	return tileData.buildingData.inventory;
+};
+
+export const crafterBehavior: GameBuildingBehavior = {
+	name: 'Crafter',
+	description: 'Crafts items. Click to select a recipe.',
+	tick(tileData, delta, mapManager, objectiveManager) {
+		if (!tileData.buildingData?.selectedRecipe) {
+			return;
 		}
-	};
-
-	private selectedRecipe: RecipeName | undefined = undefined;
-
-	constructor() {
-		super();
-	}
-
-	override new() {
-		return new Crafter();
-	}
-
-	override tick({ x, y, thisTile, mapManager, objectiveManager }: TickMethodParams) {
-		if (this.selectedRecipe) {
-			const recipe = craftingRecipes[this.selectedRecipe];
-
-			const realCounts: Partial<Record<GameItem, { seen: boolean; realCount: number }>> = {};
-			let allowed = true;
-
-			for (const item of recipe.requirements) {
-				if (this.storage[item]) {
-					if (!realCounts[item]) {
-						realCounts[item] = {
-							seen: true,
-							realCount: this.storage[item].count
-						};
-					}
-					realCounts[item].realCount -= 1;
-					if (realCounts[item].realCount < 0) {
-						allowed = false;
-						break;
-					}
-				}
-			}
-
-			if (allowed) {
-				const product = recipe.product;
-				const nextTile = getNextTile(x, y, thisTile.data.facing, mapManager);
-				if (nextTile && nextTile.canHoldItem(product)) {
-					nextTile.setHolding(product);
-					if (product == 'circuitBoard') {
-						objectiveManager.addScoreToObjectiveTracker('craft_circuit_board');
-					} else if (product == 'communicationsModule') {
-						objectiveManager.addScoreToObjectiveTracker('com');
-					}
-					for (const item of recipe.requirements) {
-						if (this.storage[item]) {
-							this.storage[item].count -= 1;
-						}
-					}
-				}
+		const recipe = tileData.buildingData.selectedRecipe;
+		const inventory = getInventory(tileData);
+		for (const key in craftingRecipes[recipe].requirements) {
+			const item = key as GameItem;
+			if ((inventory[item] ?? 0) < craftingRecipes[recipe].requirements[item]!) {
+				return;
 			}
 		}
-	}
-
-	override placeAction(): void {}
-
-	override postPlaceAction({ thisTile }: PlaceActionParams): void {
-		if (thisTile.data.holding) {
-			if (this.storage[thisTile.data.holding]) {
-				this.storage[thisTile.data.holding]!.count += 1;
-				thisTile.clearHolding();
-			}
+		const product = craftingRecipes[recipe].product;
+		const nextTile = getNextTileFromThisTile(tileData, mapManager);
+		if (
+			!tileManager.canHoldItem(nextTile, {
+				item: product
+			})
+		) {
+			return;
 		}
-	}
 
-	override getRenderer(): HTMLImageElement {
+		// were crafting it
+		for (const key in craftingRecipes[recipe].requirements) {
+			const item = key as GameItem;
+			inventory[item]! -= craftingRecipes[recipe].requirements[item]!;
+		}
+		tileManager.setHolding(nextTile, {
+			item: product
+		});
+
+		if (product == 'circuitBoard') {
+			objectiveManager.addScoreToObjectiveTracker('craft_circuit_board');
+		} else if (product == 'communicationsModule') {
+			objectiveManager.addScoreToObjectiveTracker('com');
+		}
+	},
+	postPlaceAction(tileData) {
+		if (tileData.holding) {
+			const inventory = getInventory(tileData);
+			if (!inventory[tileData.holding]) {
+				inventory[tileData.holding] = 1;
+			} else {
+				inventory[tileData.holding]! += 1;
+			}
+			tileManager.clearHolding(tileData);
+		}
+	},
+	getRenderer() {
 		if (!image) {
 			image = new Image();
 			image.src = imageData;
 		}
 		return image;
-	}
-
-	override canAcceptItem({ tile, itemName }: CanAcceptItemParams): boolean {
-		if (tile.data.holding) {
+	},
+	isValidPlacement() {
+		return true;
+	},
+	canHoldItem(tileData, item) {
+		if (tileData.holding) {
 			return false;
 		}
 
-		if (!this.storage[itemName]) {
+		if (!tileData.buildingData?.selectedRecipe) {
 			return false;
 		}
 
-		if (this.storage[itemName].count >= this.storage[itemName].max) {
+		const recipe = craftingRecipes[tileData.buildingData.selectedRecipe];
+		const max = (recipe.requirements[item] ?? 0) * 2;
+		if ((getInventory(tileData)[item] ?? 0) >= max || max == 0) {
+			console.log(getInventory(tileData));
 			return false;
 		}
 
 		return true;
-	}
-
-	override getUi({ uiManager }: GetUiParams) {
+	},
+	initBuildingData() {
 		return {
+			cooldownTimer: 0,
+			inventory: {}
+		};
+	},
+	onClick(tileData, mapManager) {
+		mapManager.uiManager.setUi({
 			component: CrafterUi,
 			props: {
-				uiManager,
-				crafter: this
+				uiManager: mapManager.uiManager,
+				crafterData: tileData
 			}
-		};
+		});
 	}
-
-	onClick({ mapManager }: OnClickParams): void {
-		mapManager.uiManager.setUi(
-			this.getUi({
-				uiManager: mapManager.uiManager
-			})
-		);
-	}
-
-	setRecipe(name: RecipeName) {
-		this.storage = {};
-		for (const req of craftingRecipes[name].requirements) {
-			if (!this.storage[req]) {
-				this.storage[req] = {
-					max: 2,
-					count: 0
-				};
-			} else {
-				this.storage[req].max += 2;
-			}
-		}
-		this.selectedRecipe = name;
-	}
-
-	getInventory(): [GameItem, number][] {
-		const i: [GameItem, number][] = [];
-		for (const invItem in this.storage) {
-			const record = this.storage[invItem as GameItem];
-			if (record && record.count > 0) {
-				i.push([invItem as GameItem, record.count]);
-			}
-		}
-		return i;
-	}
-
-	getRecipe(): RecipeName | undefined {
-		return this.selectedRecipe;
-	}
-}
+};

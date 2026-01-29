@@ -1,10 +1,14 @@
 import { createNoise2D, type NoiseFunction2D } from 'simplex-noise';
-import { type GameBuildingName } from '../gameBuildings/gameBuildings';
-import type { GameBuilding } from '../gameBuildings/utils/BehaviorBase';
 import { UiManager } from '../uiManager/uiManager';
-import { TileManager, type FacingDirection, type TerrainType } from './tileManager';
+import { tileManager, type FacingDirection, type TerrainType, type TileData } from './tileManager';
 import { getTileSize } from './tileSize';
-import type { ObjectiveManager } from '../objectiveManager/objectiveManager';
+import { ObjectiveManager } from '../objectiveManager/objectiveManager';
+import { normalizeToTile } from '$lib/utils/normalize';
+import type { GameData } from './gameData';
+import Alea from 'alea';
+import type { GameBuilding } from '../gameBuildings/gameBuildings';
+import { gameBuildingBehaviorMap } from '../gameBuildings/gameBuildingBehaviorBase';
+import { saveManager } from '../saveManager/saveManager';
 
 export const itemList = [
 	'ironOre',
@@ -23,28 +27,24 @@ export type GameItem = (typeof itemList)[number];
 
 export type Tile = {
 	data: {
-		building?: GameBuildingName;
+		building?: GameBuilding;
 		facing?: 'n' | 'e' | 's' | 'w';
 		cooldown?: number;
 		holding?: GameItem;
 	};
 };
 
-export type GameMapType = Record<number, Record<number, TileManager>>;
+export type GameMapType = Record<number, Record<number, TileData>>;
 
 export class GameMapManager {
-	size = 100;
+	private noisePatterns: Record<TerrainType, NoiseFunction2D>;
+	private gameData: GameData;
 	public uiManager: UiManager = new UiManager();
-	private map: GameMapType;
 	private canvasDimensions: {
 		width: number;
 		height: number;
 	} = { width: 0, height: 0 };
-	private playerData: {
-		x: number;
-		y: number;
-		facing: number;
-	};
+
 	private cursorData: {
 		x: number;
 		y: number;
@@ -52,66 +52,53 @@ export class GameMapManager {
 		selectedDirection: FacingDirection;
 	} = { x: 0, y: 0, selectedDirection: 'n' };
 
-	private tickables: Record<
-		string,
-		{
-			x: number;
-			y: number;
-			tileManager: TileManager;
-		}
-	> = {};
-
 	constructor() {
-		this.map = {};
-		this.playerData = {
-			x: 0,
-			y: 0,
-			facing: 0
-		};
-	}
+		this.gameData = saveManager.tryLoad();
 
-	generate(size: number) {
-		this.size = size;
-
-		const noisePatterns: Record<TerrainType, NoiseFunction2D> = {
-			iron_ore: createNoise2D(),
-			copper_ore: createNoise2D()
+		this.noisePatterns = {
+			iron_ore: createNoise2D(Alea(this.gameData.meta.seed)),
+			copper_ore: createNoise2D(Alea(this.gameData.meta.seed + 1))
 		};
 
-		for (let x = 0; x < size; x++) {
-			this.map[x] = {};
-			for (let y = 0; y < size; y++) {
-				let terrain: TerrainType | undefined = undefined;
-				let highest = 0;
-				for (const ttype in noisePatterns) {
-					const terrainType = ttype as TerrainType;
-					const value = noisePatterns[terrainType](x, y);
-					if (value > 0.95 && value > highest) {
-						highest = value;
-						terrain = terrainType;
-					}
+		console.log(this.gameData.data.tickables);
 
-					this.map[x][y] = new TileManager({
-						facing: 'n',
-						x,
-						y,
-						terrain: terrain
-					});
-				}
-			}
-		}
+		setInterval(() => {
+			saveManager.saveGame(this.gameData);
+		}, 5_000);
 	}
 
 	getTile(x: number, y: number) {
-		if (this.map[x] && this.map[x][y]) {
-			return this.map[x][y];
+		if (this.gameData.data.map[x] && this.gameData.data.map[x][y]) {
+			return this.gameData.data.map[x][y];
 		} else {
-			return undefined;
+			return this.generateTile(x, y);
 		}
 	}
 
-	getSize() {
-		return this.size;
+	generateTile(x: number, y: number) {
+		if (!this.gameData.data.map[x]) {
+			this.gameData.data.map[x] = {};
+		}
+
+		let terrain: TerrainType | undefined = undefined;
+		let highest = 0;
+
+		for (const ttype in this.noisePatterns) {
+			const terrainType = ttype as TerrainType;
+			const value = this.noisePatterns[terrainType](x / 10, y / 10);
+			if (value > 0.8 && value > highest) {
+				highest = value;
+				terrain = terrainType;
+			}
+		}
+
+		this.gameData.data.map[x][y] = {
+			facing: 'n',
+			x,
+			y,
+			terrain: terrain
+		};
+		return this.gameData.data.map[x][y];
 	}
 
 	setCanvasDimensions(width: number, height: number) {
@@ -120,54 +107,50 @@ export class GameMapManager {
 	}
 
 	tick(delta: number, tickId: number, objectiveManager: ObjectiveManager) {
-		for (const item in this.tickables) {
-			const tile = this.tickables[item];
-			tile.tileManager.tick({
+		for (const item in this.gameData.data.tickables) {
+			const tickable = this.gameData.data.tickables[item];
+			const tileData = this.gameData.data.map[tickable.x][tickable.y];
+			tileManager.tick(tileData, {
 				mapManager: this,
 				objectiveManager,
-				x: tile.x,
-				y: tile.y,
 				delta,
 				tickId
 			});
 		}
 	}
 
-	place(item: TileManager, x: number, y: number) {
-		this.map[x][y] = item;
+	place(tileData: TileData, x: number, y: number) {
+		this.gameData.data.map[x][y] = tileData;
 
-		if (item.data.building) {
-			this.tickables[`${x}-${y}`] = {
+		if (tileData.building) {
+			this.gameData.data.tickables[`${x}-${y}`] = {
 				x,
 				y,
-				tileManager: item
+				tileData: tileData
 			};
 		}
 	}
 
 	getPlayerData() {
-		return this.playerData;
+		return this.gameData.data.playerData;
 	}
 
 	getPlayerPosition() {
 		return {
 			raw: {
-				x: this.playerData.x,
-				y: this.playerData.y
+				x: this.gameData.data.playerData.x,
+				y: this.gameData.data.playerData.y
 			},
 			tile: {
-				x: Math.floor(this.playerData.x / getTileSize()),
-				y: Math.floor(this.playerData.y / getTileSize())
+				x: Math.floor(this.gameData.data.playerData.x / getTileSize()),
+				y: Math.floor(this.gameData.data.playerData.y / getTileSize())
 			}
 		};
 	}
 
 	addPlayerPosition(x: number, y: number) {
-		this.playerData.x += x;
-		this.playerData.y += y;
-
-		this.playerData.x = Math.max(0, Math.min((this.size - 1) * getTileSize(), this.playerData.x));
-		this.playerData.y = Math.max(0, Math.min((this.size - 1) * getTileSize(), this.playerData.y));
+		this.gameData.data.playerData.x += x;
+		this.gameData.data.playerData.y += y;
 	}
 
 	setCursorPosition(x: number, y: number) {
@@ -193,10 +176,10 @@ export class GameMapManager {
 	getOffsets() {
 		const playerPos = this.getPlayerPosition();
 		const xOffsetTiles = playerPos.tile.x;
-		const xOffsetPx = playerPos.raw.x % getTileSize();
+		const xOffsetPx = normalizeToTile(playerPos.raw.x % getTileSize());
 
 		const yOffsetTiles = playerPos.tile.y;
-		const yOffsetPx = playerPos.raw.y % getTileSize();
+		const yOffsetPx = normalizeToTile(playerPos.raw.y % getTileSize());
 
 		return {
 			xOffsetTiles,
@@ -207,14 +190,16 @@ export class GameMapManager {
 	}
 
 	getCursorPosition() {
+		const offsets = this.getOffsets();
+
 		return {
 			raw: {
 				x: this.cursorData.x,
 				y: this.cursorData.y
 			},
 			tile: {
-				x: Math.floor((this.cursorData.x + (this.playerData.x % getTileSize())) / getTileSize()),
-				y: Math.floor((this.cursorData.y + (this.playerData.y % getTileSize())) / getTileSize())
+				x: Math.floor((this.cursorData.x + offsets.xOffsetPx) / 48),
+				y: Math.floor((this.cursorData.y + offsets.yOffsetPx) / 48)
 			}
 		};
 	}
@@ -271,41 +256,41 @@ export class GameMapManager {
 
 		if (currentTile) {
 			if (e.button == 0) {
-				const inRange = currentTile.inPlayerPlaceRange({ map: this });
+				const inRange = tileManager.inPlayerPlaceRange(currentTile, {
+					map: this
+				});
 				if (this.cursorData.selectedBuilding) {
-					const validPlacement = this.cursorData.selectedBuilding.isValidPlacement({
-						tile: currentTile,
-						gameManager: this
-					});
+					const validPlacement =
+						gameBuildingBehaviorMap[this.cursorData.selectedBuilding].isValidPlacement(currentTile);
 
 					if (validPlacement && inRange) {
 						this.place(
-							new TileManager({
-								building: this.cursorData.selectedBuilding.new(),
+							{
+								building: this.cursorData.selectedBuilding,
+								buildingData:
+									gameBuildingBehaviorMap[this.cursorData.selectedBuilding].initBuildingData(),
 								facing: this.cursorData.selectedDirection,
-								x: currentTile.data.x,
-								y: currentTile.data.y,
-								terrain: currentTile.data.terrain
-							}),
-							currentTile.data.x,
-							currentTile.data.y
+								x: currentTile.x,
+								y: currentTile.y,
+								terrain: currentTile.terrain
+							},
+							currentTile.x,
+							currentTile.y
 						);
 					}
 				} else {
-					currentTile.onClick({
-						mapManager: this
-					});
+					tileManager.onClick(currentTile, this);
 				}
 			} else if (e.button == 2) {
 				this.place(
-					new TileManager({
-						terrain: currentTile.data.terrain,
+					{
+						terrain: currentTile.terrain,
 						facing: 'n',
-						x: currentTile.data.x,
-						y: currentTile.data.y
-					}),
-					currentTile.data.x,
-					currentTile.data.y
+						x: currentTile.x,
+						y: currentTile.y
+					},
+					currentTile.x,
+					currentTile.y
 				);
 			}
 		}

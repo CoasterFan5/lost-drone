@@ -1,5 +1,5 @@
 import type { GameMapManager } from '$lib/game/mapManager/mapManager';
-import type { FacingDirection } from '$lib/game/mapManager/tileManager';
+import type { FacingDirection, TileData } from '$lib/game/mapManager/tileManager';
 
 export const getPrevTile = (
 	x: number,
@@ -23,6 +23,14 @@ export const getPrevTile = (
 	}
 };
 
+/**
+ *
+ * @param x - The tilebase x
+ * @param y - The tilebase y
+ * @param facing - North south east west
+ * @param gameMapManager
+ * @returns
+ */
 export const getNextTile = (
 	x: number,
 	y: number,
@@ -43,6 +51,10 @@ export const getNextTile = (
 			return gameMapManager.getTile(x - 1, y);
 		}
 	}
+};
+
+export const getNextTileFromThisTile = (tileData: TileData, gameMapManager: GameMapManager) => {
+	return getNextTile(tileData.x, tileData.y, tileData.facing, gameMapManager);
 };
 
 export const getRightTIle = (
